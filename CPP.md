@@ -92,7 +92,7 @@
 
 - 自定义类型变量初始化，如果该类型并未定义构造函数则系统调用默认的构造函数`A a=A()`，如果该类型定义了构造函数`A(int aa){xxx}` 则`A a=A()`会因未遵循构造函数的格式而报错
 
-- 定义数组时，如果没有显示提供初始化列表，则数组元素的自动化初始规则同普通变量一样：
+- 定义数组时，如果没有显式提供初始化列表，则数组元素的自动化初始规则同普通变量一样：
   - 函数体外定义的内置类型数组，其元素初始为0
   - 函数体内定义的内置类型数组，其元素无初始化
   - 类类型数组无论在哪里定义，皆调用默认构造函数进行初始化，无默认构造函数则必须提供显示初始化列表
@@ -118,17 +118,17 @@ int j;  //declares and defines j
 
 ### 引用和指针
 
-- 引用实质上是一个常量指针，其对应的内存中存储的是被引用对象的内存地址，引用只能且必须初始化一次，使用引用只是为变量增加一个新名字，由于指针的错误难以被编译器发现，所以使用不可变的指针更加安全
+- 引用实质上是一个常量指针，其对应的内存中存储的是被引用对象的内存地址，引用只能且必须初始化一次，使用引用只是为变量增加一个新名字，由于指针的错误难以被编译器发现，所以使用不可变的指针更加安全，后续使用引用时就是使用其指向的变量（所有属性和其指向变量相同）
 - 指针可以改变（复制，再赋值），可以是未经初始化的空指针
 
 但二者语法使用有区别
 
-```
+```cpp
 #include<iostream>
 int main(){
         int val=1024;
         int a=1.01;
-        int& ref = val;
+        int &ref = val;
         val=3;
         std::cout << ref<<std::endl;
         std::cout << a<<std::endl;
@@ -142,14 +142,13 @@ int main(){
 1
 pointer
 0x7ffc9d9300a0/3
-
 ```
 
 - 空指针的声明方法
 
-  ```
+  ```cpp
   int *p = nullptr;(recommanded)
-  int *p = 0;
+  int *p = 0; // int null=0,*p=null合法，将0赋值给指针代表空指针 
   int *p = NULL;(old eidtion)
   ```
 
@@ -163,3 +162,139 @@ pointer
   ```
 
 - 指针的赋值过程不会默认进行类型转换，如果将int * 指向double会报错
+
+- 一个例子
+
+  ```cpp
+  #include<iostream>
+  int main(){
+          int a=1;
+          int b=2;
+          constexpr int k = a + b;//编译时就已求出值
+          int *const pointer=&a;
+          const int *pointer2const=&a;
+          int& pointer1=a;
+          //const int &pointer1=a;//编译pointer1=b时会报错，因为声明pointer1是int常量的引用，所以不能用pointer1改变其指向的值
+          std::cout << *pointer << "---" << pointer1 << std::endl;
+          a = a + 2;
+          //*pointer2const = *pointer2const + 1;//根据pointer2const的声明，其指向>的是常量，但实际上是否是常量并不能确定，如果是变量仍然能用该变量的其他名字为其更改值，只不过无法通过pointer2const来修改它的值
+          std::cout << *pointer << "---" << pointer1 << std::endl;
+          pointer1 = b;//实际是a=b，并没有提供重新给引用类型的变量pointer1的方法
+          //pointer = &b; //根据pointer的声明，他是一个常量，一经赋值后不能更改
+          std::cout << *pointer << "---" << pointer1 << std::endl;
+  }
+  ```
+
+- Top-Level const  与引用类似，一旦指向一个对象后不可变更，top-level const 指的是指针本身是一个常量，low-level const指的是指针所指对象是一个常量
+
+  ```
+  int *const p= &i //top-level const
+  const int *p = &i //we can change p, i is a top-level const
+  ```
+
+- constexpr
+
+  ```
+  C++之父是这样解释的：
+  const：承诺不改变这个值，主要用于说明接口，这样变量传递给函数就不担心变量会在函数内被修改了编译器负责确认并执行const的承诺。
+  constexpr：在编译时求值，主要用于说明常量，作用是允许数据置于只读内存以及提升性能,但并不能保证它一定在编译时被计算，也可以在运行时被计算。
+  值得注意的是，constexpr用于声明指针变量时，与const不同
+  const int *p = nullptr; //p是一个指向int常量的指针变量
+  constexpr int *p = nullptr; //p是一个指向int的指针常量, constexpr代表top-level const
+  无论指针声明是指向常量int还是变量int，在为指针赋值时都可以赋值一个变量int
+  ```
+
+### 别名
+
+尽量避免给指针做别名，在涉及const声明时可能会产生与想法不同的结果
+
+```
+两种声明方式
+typedef double wages;
+using SI = Sales_item;
+```
+
+### Auto类型
+
+用表达式赋值时可以使用auto声明该变量类型为表达式计算后的类型，它通常会忽略top-level const
+
+```
+auto item = val1 + val2
+//值得注意的是在一句声明了多个变量的声明语句中使用auto
+auto p=3.14,q=3;//error: p and q are different type
+const int ci = 0, &cr=ci;
+auto b = ci;//b is an int
+const auto b = ci; //b is an const int
+```
+
+### decltype类型
+
+使用该声明该变量类型为表达式计算后的类型，但不会为该变量赋值为表达式的计算结果
+
+```
+decltype(f()) x=y;
+examples:
+const int ci=0,&cj=ci;
+decltype(ci) x=1;
+decltype(r+0) b;
+decltype((ci)) d;//error: d is a int& and must be initialized
+decltype(ci) d;//d is a int
+```
+
+### 头文件
+
+**头文件中应该只放变量和函数的声明，而不能放它们的定义**
+
+```
+Person.h:
+
+#ifndef PERSON_H
+#define PERSON_H
+class Person
+{
+public:
+    int age;
+    char* name;
+    char* sex;
+public:
+    Person();    //构造函数
+    void say();
+};
+#endif
+
+Person.cpp:
+#include <iostream>
+#include "Person.h"
+
+using namespace std;
+
+Person::Person()
+{
+    cout << "创建了一个新的对象！" << endl;
+}
+
+void Person::say()
+{
+    cout << "大家好，我叫" << name << ",性别" << sex << ",今年" << age << "岁." << endl;
+}
+
+使用：
+
+#include <iostream>
+#include "Person.h"
+using namespace std;
+int main()
+{
+    Person xc;
+
+    xc.age = 18;
+    xc.name = "流浪";
+    xc.sex = "男";
+
+    xc.say();
+    return 0;
+}
+```
+
+
+
