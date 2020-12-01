@@ -279,22 +279,97 @@ void Person::say()
 }
 
 使用：
-
 #include <iostream>
 #include "Person.h"
 using namespace std;
 int main()
 {
     Person xc;
-
     xc.age = 18;
     xc.name = "流浪";
     xc.sex = "男";
-
     xc.say();
     return 0;
 }
 ```
+## 字符串 数组 
 
+### 字符串声明
 
+```
+string s1;//default initialization;s1 is empty string
+string s2(s1);//s2 is a copy of s1
+string s2 = s1;//equivalent to s2(s1)
+string s3("value");//direct initialization; s3 is the copy of the string literal,not including null
+string s3 = "value";//copy initialization; equivalent to s3("value")
+string s4(10,'c');//direct initialization; s4 :n copies of 'c'
+```
+
+ ### 从输入中读取字符串
+
+- cin从第一个非空白字符开始读入，至下一空白字符结束
+- getline(cin,str)按行读取但会忽略行尾的\n
+- str.empty(),str.size()
+
+### 字符串连接
+
+```c++
+string s4 = "hello" + "," //error:no string operand(操作数)
+string s5 = "hello" + "," + s1 //error:can't add string literals(复合常量)
+string s6 = s1 + "xxx" //ok
+string s7 = ("hello"+ ",") //error:can't add string literals
+```
+
+### 字符串遍历
+
+```cpp
+for (declaration:expression)
+	statement
+for (auto c: str) //遍历str中的每个char，将它复制给c
+	cout << c << endl;
+for (auto &c: str) //c引用str中的每个char
+    cout << c << endl;
+for (decltype(s.size()) index = 0; index != s.size(); ++index) //用decltype声明类型，变量类型并不是int，而是unsigned; index++也可以
+    cout << s[index] << endl;
+
+string::size_type n; //声明合法字符串下标类型，保证n >= 0，遍历时只需验证是否超出字符串长度即可
+while (cin >> n)
+    ...
+```
+
+### Vector
+
+```cpp
+#include <vector>
+using std::vector;
+实例化方式：
+Vector<T> v1; //default initialization, v1 is empty
+Vector<T> v2(v1); //copy v1 to v2
+Vector<T> v2 = v1; //equal to v2(v1), copy v1 to v2
+Vector<T> v3(n,val); //initailize v3 with n elements whose value = val
+Vector<T> v4(n); //initailize v3 with n elements whose value-initialized by T
+Vector<T> v5{a,b,c,...}
+Vector<T> v6 = {a,b,c,...}
+//Especially:
+Vector<string> v7{10,"hello"} //v7 has ten elements with value "hello"
+
+比较大小：
+a == b //两个vector的大小和每个位置的元素都相同
+a <= b //a的长度小于b且a与b在每个位置的元素相同
+
+动态添加元素：
+vector<int> ivec;
+ivec.push_back(42);
+ivec[0] = 0; //error: [] can only refer the element which has existed
+
+遍历：
+//一般不使用for循环，动态变化时会出错
+//迭代器
+for (auto it = s.begin(); it != s.end(); it++)
+{
+    *it = toupper(*it);
+}
+```
+
+## 迭代器
 
