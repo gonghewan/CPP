@@ -143,6 +143,27 @@ int main(){
 pointer
 0x7ffc9d9300a0/3
 ```
+```
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int a=20;
+    int *p=&a;
+    int ** q=&p;
+    cout << typeid(p).name() << p<< endl; //Pi 0x61fe1c
+    cout << typeid(*p).name() << *p<<endl; //i 20
+    cout << typeid(&p).name() << &p<<endl; //PPi 0x61fe10
+    cout << typeid(q).name() << &q<<endl; //PPi 0x61fe08
+    return 0;
+}
+memory: 
+0x61fe08: 10 fe 61 00 00 00 00 00|1c fe 61 00 00 00 00 00    
+0x61fe18: 10 00 00 00 14 00 00 00|90 19 0a 01 00 00 00 00   
+0x61fe28: c7 13 40 00 00 00 00 00|00 00 00 00 00 00 00 00    
+0x61fe38: 48 00 00 00 00 00 00 00|70 79 40 00 00 00 00 00
+```
 
 - 空指针的声明方法
 
