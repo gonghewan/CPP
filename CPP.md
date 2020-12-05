@@ -453,6 +453,19 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    cout << (grade < 60) ? "fail" : "pass"; // prints 1 or 0! <==> (cout << (grade < 60) )? "fail" : "pass";
    cout << grade < 60 ? "fail" : "pass"; // error: compares cout to 60 <==> cout << grade; cout < 60 ? "fail" : "pass";
    ```
+- sizeof
+   The result of sizeof is a constant expression of type size_t. The operator takes one of two forms:
+   - sizeof (type)
+   - sizeof expr
+   ```
+   Sales_data data, *p;
+   sizeof(Sales_data); // size required to hold an object of type Sales_data
+   sizeof data; // size of data's type, i.e., sizeof(Sales_data)
+   sizeof p; // size of a pointer
+   sizeof *p; // size of the type to which p points, i.e., sizeof(Sales_data)
+   sizeof data.revenue; // size of the type of Sales_data's revenue member
+   sizeof Sales_data::revenue; // alternative way to get the size of revenue
+   ```
 ## 其它
  - char * 和 char[]的区别
    ```
