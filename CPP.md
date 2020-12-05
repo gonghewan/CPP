@@ -419,14 +419,41 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
   -21 % -8; /* result is -5 */ -21 / -8; /* result is 2 */
   21 % -5; /* result is 1 */ 21 / -5; /* result is -4 */
   ```
- - bool型true和false在与int类型对象比较时会转换为1/0
+- bool型true和false在与int类型对象比较时会转换为1/0
    ```
    if (val) { /* ... */ } // true if val is any nonzero value
    if (!val) { /* ... */ } // true if val is zero
    if (val == true) { /* ... */ } // true only if val is equal to 1!
    ```
- 
- ## 其它
+- 优先级
+   ```
+    i != j < k   <==>  i != (j < k) 
+    *pbeg++      <==>  *(pbeg++)
+   ```
+- 连续赋值
+   ```
+   int ival, jval;
+   ival = jval = 0; // <==> javal = 0 -> ival = jval
+   int ival, *pval; // ival is an int; pval is a pointer to int
+   ival = pval = 0; // error: cannot assign the value of a pointer to an int
+   string s1, s2;
+   s1 = s2 = "OK"; // string literal "OK" converted to string
+   ```
+- .和->
+   ```
+   string s1 = "a string", *p = &s1;
+   auto n = s1.size(); // run the size member of the string s1
+   n = (*p).size(); // run size on the object to which p points, * has a lower precedence then . 
+   n = p->size(); // equivalent to (*p).size()  
+   ```
+- 条件操作符
+   ```
+   finalgrade = (grade > 90) ? "high pass" : (grade < 60) ? "fail" : "pass";
+   cout << ((grade < 60) ? "fail" : "pass"); // prints pass or fail
+   cout << (grade < 60) ? "fail" : "pass"; // prints 1 or 0! <==> (cout << (grade < 60) )? "fail" : "pass";
+   cout << grade < 60 ? "fail" : "pass"; // error: compares cout to 60 <==> cout << grade; cout < 60 ? "fail" : "pass";
+   ```
+## 其它
  - char * 和 char[]的区别
    ```
         #include "stdafx.h"
