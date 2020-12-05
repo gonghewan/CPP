@@ -406,5 +406,48 @@ cout << i << " " << ++i << endl; // output: 0,1 or 1,1
 s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能保证其结果的运算顺序
 ```
 能够保证运算顺序的操作符有：'&&','||','?:',','
+### 数学运算
+- 注意运算结果是否超出其类型的限制长度
+- 除法
+  - 整数相除时，商的小数部分舍弃(向0取整)
+  - 早期的版本中负商向上/下取整，新标准中选取向0取整的方法
+- 取余
+  - 规定 if m%n is nonzeroo, it has the same sign as m. 
+  ```
+  21 % 6; /* result is 3 */ 21 / 6; /* result is 3 */
+  21 % 7; /* result is 0 */ 21 / 7; /* result is 3 */
+  -21 % -8; /* result is -5 */ -21 / -8; /* result is 2 */
+  21 % -5; /* result is 1 */ 21 / -5; /* result is -4 */
+  ```
+ - bool型true和false在与int类型对象比较时会转换为1/0
+   ```
+   if (val) { /* ... */ } // true if val is any nonzero value
+   if (!val) { /* ... */ } // true if val is zero
+   if (val == true) { /* ... */ } // true only if val is equal to 1!
+   ```
+ 
+ ## 其它
+ - char * 和 char[]的区别
+   ```
+        #include "stdafx.h"
+	#include <string>
+	#include <iostream>
+	using namespace std;
+	int _tmain(int argc, _TCHAR* argv[])
+	{
+	char *c1 = "abc";
+	char c2[] = "abc";
+	cout <<" *c1是 ：" << *c1 <<endl; // a 
+	cout <<"c2 是："<< c2 << endl; //abc
+	cout <<"*c2 是："<< *c2 << endl; //a
 
+	string namee = "xuhaitao";
+	const char *c3 = namee.data();
+	cout <<"*c3是： "<< *c3 << endl; //x
+	const char *c4 = namee.c_str(); 
+	cout <<"*c4是： "<<*c4 << endl; //x
 
+	getchar();
+	return 0;
+	}
+   ```
