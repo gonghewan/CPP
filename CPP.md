@@ -489,7 +489,7 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
   - In initializations, the initializer is converted to the type of the variable; in assignments, the right-hand operand is converted to the type of the left-hand.
   - In arithmetic and relational expressions with operands of mixed types, the types are converted to a common type.
   - As we’ll see in Chapter 6, conversions also happen during function calls.
-### 四种强制转换
+## 四种强制转换
   - static_cast 可以实现 C++内置基本类型的转换；支持子类指针到父类指针的转换，并根据实际情况调整指针的值，反过来也支持，但会给出编译警告，它作用最类似C风格的“强制转换”，一般来说可认为它是安全的；
   ```
   double d = 12.34;
@@ -561,7 +561,7 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
 	f();
 	}
   ```
-### 四种跳转语句
+## 四种跳转语句
 - break 只影响最近的循环或switch，终止本层循环
 - continue 只影响最近的循环，跳过其后的语句立即开始下次循环
 - goto 无条件跳转至同一函数的另一语句
@@ -578,7 +578,7 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
         goto begin; 
   }
   ```
-### Exception Handling
+## Exception Handling
 - exception
   ```
   if (item1.isbn() != item2.isbn()) 
@@ -594,7 +594,8 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
        handler-statements 
   } // . . .
   ```
-  
+## 函数
+- 
 
 ## 其它
  - char * 和 char[]的区别
