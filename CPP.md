@@ -454,7 +454,7 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    cout << grade < 60 ? "fail" : "pass"; // error: compares cout to 60 <==> cout << grade; cout < 60 ? "fail" : "pass";
    ```
 - sizeof
-   The result of sizeof is a constant expression of type size_t. The operator takes one of two forms:
+  The result of sizeof is a constant expression of type size_t. The operator takes one of two forms:
    - sizeof (type)
    - sizeof expr
    ```
@@ -466,6 +466,102 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    sizeof data.revenue; // size of the type of Sales_data's revenue member
    sizeof Sales_data::revenue; // alternative way to get the size of revenue
    ```
+   The result of applying sizeof depends in part on the type involved:
+   - sizeof char or an expression of type char is guaranteed to be 1.
+   - sizeof a reference type returns the size of an object of the referenced type.
+   - sizeof a pointer returns the size needed hold a pointer.
+   - sizeof a dereferenced pointer returns the size of an object of the type to which the pointer points; the pointer need ==not be valid==.
+   - sizeof an array is the size of the entire array. It is equivalent to taking the sizeof the element type times the number of elements in the array. Note that sizeof does      not convert the array to a pointer.
+   - sizeof a string or a vector returns only the size of the fixed part of these types; it does not return the size used by the object’s elements.
+- comma
+  逗号的优先级最低
+  ```
+  someValue ? ++x, ++y : --x, --y   <==>  (someValue ? ++x, ++y : --x), --y
+  ```
+- type conversion
+  在可以转换的情况下优先考虑不损失精度
+  ```
+  int ival = 3.541 + 3;  <==>  3.541+3.0---> int(6.541)
+  ```
+  The compiler automatically converts operands in the following circumstances:
+  - In most expressions, values of integral types smaller than int are first promoted to an appropriate larger integral type.
+  - In conditions, nonbool expressions are converted to bool.
+  - In initializations, the initializer is converted to the type of the variable; in assignments, the right-hand operand is converted to the type of the left-hand.
+  - In arithmetic and relational expressions with operands of mixed types, the types are converted to a common type.
+  - As we’ll see in Chapter 6, conversions also happen during function calls.
+- 四种强制转换
+  - static_cast 可以实现 C++内置基本类型的转换；支持子类指针到父类指针的转换，并根据实际情况调整指针的值，反过来也支持，但会给出编译警告，它作用最类似C风格的“强制转换”，一般来说可认为它是安全的；
+  ```
+  double d = 12.34;
+  int a = static_cast<int>(d); // a = 12
+  class Base{};
+  class Derived :public Base{};
+  Derived d;
+  Base e = staic_cast<Base>(d);
+  ```
+  - dynamic_cast 和static_cast是相对的，static_cast是在编译的时候进行转换的。它是动态的在运行时候转换的，而且 只能在继承类对象的指针或引用之间进行转换，在进行转换的时候，会根据当前RTTI （运行时类型识别）判断类型对象之间的转换是否合法，如果合法就转换成功了，返回了指向类的引用或指责，但是如果转换是非法的，则返回NULL或者0。使用dynamic_cast进行转换的时候，基类一定要有虚函数，另外它向上转换的时候是兼容的，向下转换的时候有类型安全检查，比static_cast要安全。
+  ```
+  class A {
+  public:
+	virtual void f() {}
+  };
+  class B : public A
+  {};
+  void fun(A* pa) {
+	// dynamic_cast会先检查是否能转换成功，
+	// 能成功则转换，不能则返回0
+	cout << "pa" <<' '<< typeid(pa).name()<<pa << endl;
+	B* pb1 = static_cast<B*>(pa);
+	B* pb2 = dynamic_cast<B*>(pa);
+	cout << "pb1" <<' '<<typeid(pb1).name()<<' '<< pb1 << endl;
+	cout << "pb2" <<' '<<typeid(pb2).name()<<' '<< pb2 << endl;
+	//pa   class A*  00AFFE00
+	//pb1  class B*  00AFFE00
+	//pb2  class B*  00000000
+	}
+  int main() {
+	A a;
+	fun(&a);
+	system("pause");
+	return 0;
+  }
+  ```
+  - const_cast 目的并不是为了让你去修改一个本身被定义为const的值，因为这样做的后果是无法预期的。const_cast的目的是修改一些指针/引用的权限，如果我们原本无法通过这些指针/引用修改某块内存的值，现在你可以了，但是当你去改变const的值时并不会真正地改变const的值，而且会被提示未定义的动作。如我们可能调用了一个参数不是const的函数，而我们要传进去的实际参数确实const的，但是我们知道这个函数是不会对参数做修改的。于是我们就需要使用const_cast去除const限定，以便函数能够接受这个实际参数。
+  ```
+  void func(const int& a)//形参为，引用指向const int
+  {
+	int& b = const_cast<int&>(a);//去掉const限定，因为原本为非常量
+	b++;
+	return;
+  }
+  int main()
+  {
+	int a = 100;
+	func(a);
+	cout << a << endl;  // 打印101
+	return 0;
+  }
+  ```
+  - reinterpret_cast 支持任何转换，但仅仅是如它的名字所描述的那样“重解释”而已，不会对指针的值进行任何调整，用它完全可以做到“指鹿为马”，但很明显，它是最不安全的转换
+  ```
+  double d = 9.3;
+  double *pd = &d;
+  int *pi = reinterpret_cast<int*>(pd);
+  //上面是将 double * 转换为 int * ，但是不可以用于非指针类型的转换，reinterpret_cast 同时也不能将一个const指针转换为void*指针
+  //这里是将一个整形函数转换为函数指针的类型去调用，但是存在着缺陷
+  typedef void(*FUNC)();
+  int DoSomething(int i){
+	cout << "DoSomething" << endl;
+	return 0;
+  }
+  void Test(){
+	// reinterpret_cast可以编译 
+	// 以FUNC的定义方式去看待DoSomething函数,非常的BUG，下面转换函数指针的代码是不可移植的，C++不保证所有的函数指针都被一样的使用，所以这样用有时会产生不确定的结果
+	FUNC f = reinterpret_cast<FUNC>(DoSomething);
+	f();
+	}
+
+  ```
 ## 其它
  - char * 和 char[]的区别
    ```
