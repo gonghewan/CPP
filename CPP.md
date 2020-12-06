@@ -595,8 +595,53 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
   } // . . .
   ```
 ## 函数
-- argument(实参) parameter(形参)
+- argument(实参) 与 parameter(形参)
   实参是函数调用的实际值，是形参的初始值
+- local variable 与 static
+  ```
+  size_t count_calls()
+  {
+   static size_t ctr = 0; // value will persist across calls
+   return ++ctr;
+  }
+  int main()
+  {
+   for (size_t i = 0; i != 10; ++i) cout << count_calls() << endl; return 0;
+  }
+  //This program will print the numbers from 1 through 10 inclusive.
+  ```
+- CC命令
+  ```
+  //a.c
+  #include <stdio.h>
+  #include "b.h"
+  main(){
+  bb();
+  }
+  //b.h
+  int a;
+  void bb(void);
+
+  //b.c
+  #include <stdio.h>
+  #include "b.h"
+  int a=4;
+  void bb(){
+  printf("das%d\n",a);
+  }
+  
+  cc -c a.c;此命令生成a.o
+  cc -c b.c;此命令生成b.o
+  ar -crv libb.a b.o;此命令生成静态库文件
+  以下六中连接方式都是可以的，最终都生成了同样的可执行文件a：
+  cc -o a a.c b.c
+  cc -o a a.c b.o
+  cc -c a a.o b.c
+  cc -o a a.o b.o
+  cc -o a a.c libb.a
+  cc -o a a.o libb.a
+  以上都是将库文件直接复制到程序文件中，链接的文件既可以是.o文件，也可以是源代码文件，但是有一点特殊的是，当我们生成动态库的时候，就只能用源代码文件去生成动态库了，而不能用中间代码.o文件去生成，举个例子：a.c是主程序源代码，a.o是编译后的二进制文件，生成动态库文件libb.so用下面的命令: cc -shared -fPIC -o libb.so a.c, 而不能用cc -shared -fPIC -o libb.so a.o
+  ```
 
 ## 其它
  - char * 和 char[]的区别
