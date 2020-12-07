@@ -360,7 +360,7 @@ a <= b //a的长度小于b且a与b在每个位置的元素相同
 动态添加元素：
 vector<int> ivec;
 ivec.push_back(42);
-ivec[0] = 0; //error: [] can only refer the element which has existed
+ivec[1] = 0; //error: [] can only refer the element which has existed
 
 遍历：
 //一般不使用for循环，动态变化时会出错
@@ -371,5 +371,163 @@ for (auto it = s.begin(); it != s.end(); it++)
 }
 ```
 
+## 数组
+
+数组和Vector数据结构类似，但在性能和灵活度做了折中，数组必须固定大小，不能增加元素，不能进行copy和assign。
+
+```cpp
+int a[] = {0, 1, 2}; // array of three ints
+int a2[] = a;        // error: cannot initialize one array with another
+a2 = a;              // error: cannot assign one array to another
+
+
+unsigned cnt = 42;          // not a constant expression
+constexpr unsigned sz = 42; // constant expression
+                            // constexpr see § 2.4.4 (p. 66)
+int arr[10];             // array of ten ints
+int *parr[sz];           // array of 42 pointers to int
+string bad[cnt];         // error: cnt is not a constant expression
+string strs[get_size()]; // ok if get_size is constexpr, error otherwise
+
+
+const unsigned sz = 3;
+int ia1[sz] = {0,1,2};        //array of three ints with values 0, 1, 2
+int a2[] = {0, 1, 2};         //an array of dimension 3
+int a3[5] = {0, 1, 2};        //equivalent to a3[] = {0, 1, 2, 0, 0}
+string a4[3] = {"hi", "bye"}; //same as a4[] =  {"hi", "bye", ""}
+int a5[2] = {0,1,2};          //error: too many initializers
+
+char a1[] = {'C', '+', '+'};       // list initialization, no null
+char a2[] = {'C', '+', '+', '\0'}; // list initialization, explicit null
+char a3[] = "C++";                 // null terminator added
+automatically
+const char a4[6] = "Daniel";       // error: 'D' 'a' 'n' 'i' 'e' 'l' '\0', no space for the null! 
+```
+
+The dimension of a1 is 3; the dimensions of a2 and a3 are both 4. The definition of a4 is in error. Although the literal contains only six explicit characters, the array size must be at least seven—six to hold the literal and one for the null.
+
+```cpp
+int *ptrs[10];            //  ptrs is an array of ten pointers to int
+int &refs[10] = /* ? */;  //  error: no arrays of references
+int (*Parray)[10] = &arr; //  Parray points to an array of ten ints
+int (&arrRef)[10] = arr;  //  arrRef refers to an array of ten ints
+```
+
+遍历
+
+```cpp
+for (auto i : scores) 
+   cout << i << " ";      // print the value of that counter
+cout << endl;
+
+int ia[] = {0,1,2,3,4,5,6,7,8,9}; // ia is an array of ten ints
+int *beg = begin(ia); // pointer to the first element in ia
+int *last = end(ia);  // pointer one past the last element in ia
+
+// pbeg points to the first and pend points just past the last element in arr
+int *pbeg = begin(arr),  *pend = end(arr);
+// find the first negative element, stopping if we've seen all the elements
+while (pbeg != pend && *pbeg >= 0)
+    ++pbeg;
+auto n = end(arr) - begin(arr);// n is 5, the number of elements in arr
+```
+
+指针和数组
+
+```cpp
+string nums[] = {"one", "two", "three"};  // array of strings
+string *p = &nums[0];   // p points to the first element in nums
+string *p2 = nums;      // equivalent to p2 = &nums[0]
+
+int ia[] = {0,1,2,3,4,5,6,7,8,9}; // ia is an array of ten ints
+auto ia2(ia); // ia2 is an int* that points to the first element in ia
+ia2 = 42;     // error: ia2 is a pointer, and we can't assign an int to a pointer
+auto ia2(&ia[0]);  // now it's clear that ia2 has type int*
+
+// ia3 is an array of ten ints
+decltype(ia) ia3 = {0,1,2,3,4,5,6,7,8,9};
+ia3 = p;    // error: can't assign an int* to an array
+ia3[4] = i; // ok: assigns the value of i to an element in ia3
+
+int arr[] = {0,1,2,3,4,5,6,7,8,9};
+int *p = arr; // p points to the first element in arr
+++p;          // p points to arr[1]
+int *e = &arr[10]; // pointer just past the last element in arr
+for (int *b = arr; b != e; ++b)
+    cout << *b << endl; // print the elements in arr
+
+int ia[] = {0,2,4,6,8}; // array with 5 elements of type int
+int last = *(ia + 4); // ok: initializes last to 8, the value of ia[4]
+last = *ia + 4;  // ok: last = 4, equivalent to ia[0] + 4
+
+int ia[] = {0,2,4,6,8};  // array with 5 elements of type int
+int i = ia[2];  //ia is converted to a pointer to the first element in ia
+                //ia[2] fetches the element to which (ia + 2) points
+int *p = ia;    //p points to the first element in ia
+i = *(p + 2);   //equivalent to i = ia[2]
+int *p = &ia[2];  //p points to the element indexed by 2
+int j = p[1];     //p[1] is equivalent to *(p + 1),
+                  //p[1] is the same element as ia[3]
+int k = p[-2];    //p[-2] is the same element as ia[0]
+
+
+
+
+```
+
+
+
 ## 迭代器
 
+- 标准容器迭代器操作
+
+```cpp
+*iter	Return a reference to the element denoted by the iter
+iter->mem	equals to (*iter).mem
+++iter refer to the next element  
+--iter refer to the before element
+iter1 == iter2	iter1 and iter2 refer to the same element or they are the off-the-end iterator for the same container
+```
+
+- vector, string, array类容器
+
+```cpp
+iter + n	
+iter - n
+iter += n
+iter -= n
+iter1 - iter2
+>,>=,<,<=	//One iterator is less than another if it refers to an elemment that appears in the container before the one referred to by the other iterator
+```
+
+- 迭代器类型
+
+```
+vector<int>::iterator it; // it can read and write vector<int> elements
+string::iterator it2;     // it2 can read and write characters in a string
+vector<int>::const_iterator it3; // it3 can read but not write elements
+string::const_iterator it4;      // it4 can read but not write characters
+```
+
+A const_iterator behaves like a const pointer. Like a const pointer, a const_iterator may read but not write the element it denotes; an
+object of type iterator can both read and write. If a vector or string is const, we may use only its const_iterator type. With a nonconst vector or string,
+we can use either iterator or const_iterator.
+
+The type returned by begin and end depends on whether the object on which they
+operator is const. If the object is const, then begin and end return a
+const_iterator; if the object is not const, they return iterator:
+
+```
+vector<int> v;
+const vector<int> cv;
+auto it1 = v.begin();  // it1 has type vector<int>::iterator
+auto it2 = cv.begin(); // it2 has type vector<int>::const_iterator
+```
+
+Regardless of whether the vector (or string) is const, they return a const_iterator.
+
+```
+auto it3 = v.cbegin(); // it3 has type vector<int>::const_iterator
+```
+
+- 使用迭代器时不应向该迭代器指向的容器中增加元素
