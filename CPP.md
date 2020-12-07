@@ -143,6 +143,27 @@ int main(){
 pointer
 0x7ffc9d9300a0/3
 ```
+```
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int a=20;
+    int *p=&a;
+    int ** q=&p;
+    cout << typeid(p).name() << p<< endl; //Pi 0x61fe1c
+    cout << typeid(*p).name() << *p<<endl; //i 20
+    cout << typeid(&p).name() << &p<<endl; //PPi 0x61fe10
+    cout << typeid(q).name() << &q<<endl; //PPi 0x61fe08
+    return 0;
+}
+memory: 
+0x61fe08: 10 fe 61 00 00 00 00 00|1c fe 61 00 00 00 00 00    
+0x61fe18: 10 00 00 00 14 00 00 00|90 19 0a 01 00 00 00 00   
+0x61fe28: c7 13 40 00 00 00 00 00|00 00 00 00 00 00 00 00    
+0x61fe38: 48 00 00 00 00 00 00 00|70 79 40 00 00 00 00 00
+```
 
 - 空指针的声明方法
 
@@ -479,6 +500,7 @@ int k = p[-2];    //p[-2] is the same element as ia[0]
 
 ## 迭代器
 
+<<<<<<< HEAD
 - 标准容器迭代器操作
 
 ```cpp
@@ -531,3 +553,279 @@ auto it3 = v.cbegin(); // it3 has type vector<int>::const_iterator
 ```
 
 - 使用迭代器时不应向该迭代器指向的容器中增加元素
+=======
+## 运算符
+### rvalue和lvalue
+### 计算顺序
+```
+int i = f1() * f2(); //如果f1和f2对同一个对象做运算，不能保证结果运算正确，因为f1和f2的运算顺序并不确定
+
+int i = 0;
+cout << i << " " << ++i << endl; // output: 0,1 or 1,1
+
+s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能保证其结果的运算顺序
+```
+能够保证运算顺序的操作符有：'&&','||','?:',','
+### 数学运算
+- 注意运算结果是否超出其类型的限制长度
+- 除法
+  - 整数相除时，商的小数部分舍弃(向0取整)
+  - 早期的版本中负商向上/下取整，新标准中选取向0取整的方法
+- 取余
+  - 规定 if m%n is nonzeroo, it has the same sign as m. 
+  ```
+  21 % 6; /* result is 3 */ 21 / 6; /* result is 3 */
+  21 % 7; /* result is 0 */ 21 / 7; /* result is 3 */
+  -21 % -8; /* result is -5 */ -21 / -8; /* result is 2 */
+  21 % -5; /* result is 1 */ 21 / -5; /* result is -4 */
+  ```
+- bool型true和false在与int类型对象比较时会转换为1/0
+   ```
+   if (val) { /* ... */ } // true if val is any nonzero value
+   if (!val) { /* ... */ } // true if val is zero
+   if (val == true) { /* ... */ } // true only if val is equal to 1!
+   ```
+- 优先级
+   ```
+    i != j < k   <==>  i != (j < k) 
+    *pbeg++      <==>  *(pbeg++)
+   ```
+- 连续赋值
+   ```
+   int ival, jval;
+   ival = jval = 0; // <==> javal = 0 -> ival = jval
+   int ival, *pval; // ival is an int; pval is a pointer to int
+   ival = pval = 0; // error: cannot assign the value of a pointer to an int
+   string s1, s2;
+   s1 = s2 = "OK"; // string literal "OK" converted to string
+   ```
+- .和->
+   ```
+   string s1 = "a string", *p = &s1;
+   auto n = s1.size(); // run the size member of the string s1
+   n = (*p).size(); // run size on the object to which p points, * has a lower precedence then . 
+   n = p->size(); // equivalent to (*p).size()  
+   ```
+- 条件操作符
+   ```
+   finalgrade = (grade > 90) ? "high pass" : (grade < 60) ? "fail" : "pass";
+   cout << ((grade < 60) ? "fail" : "pass"); // prints pass or fail
+   cout << (grade < 60) ? "fail" : "pass"; // prints 1 or 0! <==> (cout << (grade < 60) )? "fail" : "pass";
+   cout << grade < 60 ? "fail" : "pass"; // error: compares cout to 60 <==> cout << grade; cout < 60 ? "fail" : "pass";
+   ```
+- sizeof
+  The result of sizeof is a constant expression of type size_t. The operator takes one of two forms:
+   - sizeof (type)
+   - sizeof expr
+   ```
+   Sales_data data, *p;
+   sizeof(Sales_data); // size required to hold an object of type Sales_data
+   sizeof data; // size of data's type, i.e., sizeof(Sales_data)
+   sizeof p; // size of a pointer
+   sizeof *p; // size of the type to which p points, i.e., sizeof(Sales_data)
+   sizeof data.revenue; // size of the type of Sales_data's revenue member
+   sizeof Sales_data::revenue; // alternative way to get the size of revenue
+   ```
+   The result of applying sizeof depends in part on the type involved:
+   - sizeof char or an expression of type char is guaranteed to be 1.
+   - sizeof a reference type returns the size of an object of the referenced type.
+   - sizeof a pointer returns the size needed hold a pointer.
+   - sizeof a dereferenced pointer returns the size of an object of the type to which the pointer points; the pointer need ==not be valid==.
+   - sizeof an array is the size of the entire array. It is equivalent to taking the sizeof the element type times the number of elements in the array. Note that sizeof does      not convert the array to a pointer.
+   - sizeof a string or a vector returns only the size of the fixed part of these types; it does not return the size used by the object’s elements.
+- comma
+  逗号的优先级最低
+  ```
+  someValue ? ++x, ++y : --x, --y   <==>  (someValue ? ++x, ++y : --x), --y
+  ```
+- type conversion
+  在可以转换的情况下优先考虑不损失精度
+  ```
+  int ival = 3.541 + 3;  <==>  3.541+3.0---> int(6.541)
+  ```
+  The compiler automatically converts operands in the following circumstances:
+  - In most expressions, values of integral types smaller than int are first promoted to an appropriate larger integral type.
+  - In conditions, nonbool expressions are converted to bool.
+  - In initializations, the initializer is converted to the type of the variable; in assignments, the right-hand operand is converted to the type of the left-hand.
+  - In arithmetic and relational expressions with operands of mixed types, the types are converted to a common type.
+  - As we’ll see in Chapter 6, conversions also happen during function calls.
+## 四种强制转换
+  - static_cast 可以实现 C++内置基本类型的转换；支持子类指针到父类指针的转换，并根据实际情况调整指针的值，反过来也支持，但会给出编译警告，它作用最类似C风格的“强制转换”，一般来说可认为它是安全的；
+  ```
+  double d = 12.34;
+  int a = static_cast<int>(d); // a = 12
+  class Base{};
+  class Derived :public Base{};
+  Derived d;
+  Base e = staic_cast<Base>(d);
+  ```
+  - dynamic_cast 和static_cast是相对的，static_cast是在编译的时候进行转换的。它是动态的在运行时候转换的，而且 只能在继承类对象的指针或引用之间进行转换，在进行转换的时候，会根据当前RTTI （运行时类型识别）判断类型对象之间的转换是否合法，如果合法就转换成功了，返回了指向类的引用或指责，但是如果转换是非法的，则返回NULL或者0。使用dynamic_cast进行转换的时候，基类一定要有虚函数，另外它向上转换的时候是兼容的，向下转换的时候有类型安全检查，比static_cast要安全。
+  ```
+  class A {
+  public:
+	virtual void f() {}
+  };
+  class B : public A
+  {};
+  void fun(A* pa) {
+	// dynamic_cast会先检查是否能转换成功，
+	// 能成功则转换，不能则返回0
+	cout << "pa" <<' '<< typeid(pa).name()<<pa << endl;
+	B* pb1 = static_cast<B*>(pa);
+	B* pb2 = dynamic_cast<B*>(pa);
+	cout << "pb1" <<' '<<typeid(pb1).name()<<' '<< pb1 << endl;
+	cout << "pb2" <<' '<<typeid(pb2).name()<<' '<< pb2 << endl;
+	//pa   class A*  00AFFE00
+	//pb1  class B*  00AFFE00
+	//pb2  class B*  00000000
+	}
+  int main() {
+	A a;
+	fun(&a);
+	system("pause");
+	return 0;
+  }
+  ```
+  - const_cast 目的并不是为了让你去修改一个本身被定义为const的值，因为这样做的后果是无法预期的。const_cast的目的是修改一些指针/引用的权限，如果我们原本无法通过这些指针/引用修改某块内存的值，现在你可以了，但是当你去改变const的值时并不会真正地改变const的值，而且会被提示未定义的动作。如我们可能调用了一个参数不是const的函数，而我们要传进去的实际参数确实const的，但是我们知道这个函数是不会对参数做修改的。于是我们就需要使用const_cast去除const限定，以便函数能够接受这个实际参数。
+  ```
+  void func(const int& a)//形参为，引用指向const int
+  {
+	int& b = const_cast<int&>(a);//去掉const限定，因为原本为非常量
+	b++;
+	return;
+  }
+  int main()
+  {
+	int a = 100;
+	func(a);
+	cout << a << endl;  // 打印101
+	return 0;
+  }
+  ```
+  - reinterpret_cast 支持任何转换，但仅仅是如它的名字所描述的那样“重解释”而已，不会对指针的值进行任何调整，用它完全可以做到“指鹿为马”，但很明显，它是最不安全的转换
+  ```
+  double d = 9.3;
+  double *pd = &d;
+  int *pi = reinterpret_cast<int*>(pd);
+  //上面是将 double * 转换为 int * ，但是不可以用于非指针类型的转换，reinterpret_cast 同时也不能将一个const指针转换为void*指针
+  //这里是将一个整形函数转换为函数指针的类型去调用，但是存在着缺陷
+  typedef void(*FUNC)();
+  int DoSomething(int i){
+	cout << "DoSomething" << endl;
+	return 0;
+  }
+  void Test(){
+	// reinterpret_cast可以编译 
+	// 以FUNC的定义方式去看待DoSomething函数,非常的BUG，下面转换函数指针的代码是不可移植的，C++不保证所有的函数指针都被一样的使用，所以这样用有时会产生不确定的结果
+	FUNC f = reinterpret_cast<FUNC>(DoSomething);
+	f();
+	}
+  ```
+## 四种跳转语句
+- break 只影响最近的循环或switch，终止本层循环
+- continue 只影响最近的循环，跳过其后的语句立即开始下次循环
+- goto 无条件跳转至同一函数的另一语句
+  ```
+  goto end;  
+  int ix = 10; // error: goto bypasses an initialized variable definition 
+  end: 
+  // error: code here could use ix but the goto bypassed its declaration  
+  ix = 42;
+  // backward jump over an initialized variable definition is okay
+  begin: 
+    int sz = get_size(); 
+    if (sz <= 0) { 
+        goto begin; 
+  }
+  ```
+## Exception Handling
+- exception
+  ```
+  if (item1.isbn() != item2.isbn()) 
+      throw runtime_error("Data must refer to same ISBN");
+  ```
+- try Block
+  ```
+  try { 
+       program-statements 
+  } catch (exception-declaration) {  
+       handler-statements 
+  } catch (exception-declaration) {  
+       handler-statements 
+  } // . . .
+  ```
+## 函数
+- argument(实参) 与 parameter(形参)
+  实参是函数调用的实际值，是形参的初始值
+- local variable 与 static
+  ```
+  size_t count_calls()
+  {
+   static size_t ctr = 0; // value will persist across calls
+   return ++ctr;
+  }
+  int main()
+  {
+   for (size_t i = 0; i != 10; ++i) cout << count_calls() << endl; return 0;
+  }
+  //This program will print the numbers from 1 through 10 inclusive.
+  ```
+- CC命令
+  ```
+  //a.c
+  #include <stdio.h>
+  #include "b.h"
+  main(){
+  bb();
+  }
+  //b.h
+  int a;
+  void bb(void);
+
+  //b.c
+  #include <stdio.h>
+  #include "b.h"
+  int a=4;
+  void bb(){
+  printf("das%d\n",a);
+  }
+  
+  cc -c a.c;此命令生成a.o
+  cc -c b.c;此命令生成b.o
+  ar -crv libb.a b.o;此命令生成静态库文件
+  以下六中连接方式都是可以的，最终都生成了同样的可执行文件a：
+  cc -o a a.c b.c
+  cc -o a a.c b.o
+  cc -c a a.o b.c
+  cc -o a a.o b.o
+  cc -o a a.c libb.a
+  cc -o a a.o libb.a
+  以上都是将库文件直接复制到程序文件中，链接的文件既可以是.o文件，也可以是源代码文件，但是有一点特殊的是，当我们生成动态库的时候，就只能用源代码文件去生成动态库了，而不能用中间代码.o文件去生成，举个例子：a.c是主程序源代码，a.o是编译后的二进制文件，生成动态库文件libb.so用下面的命令: cc -shared -fPIC -o libb.so a.c, 而不能用cc -shared -fPIC -o libb.so a.o
+  ```
+
+## 其它
+ - char * 和 char[]的区别
+   ```
+        #include "stdafx.h"
+	#include <string>
+	#include <iostream>
+	using namespace std;
+	int _tmain(int argc, _TCHAR* argv[])
+	{
+	char *c1 = "abc";
+	char c2[] = "abc";
+	cout <<" *c1是 ：" << *c1 <<endl; // a 
+	cout <<"c2 是："<< c2 << endl; //abc
+	cout <<"*c2 是："<< *c2 << endl; //a
+
+	string namee = "xuhaitao";
+	const char *c3 = namee.data();
+	cout <<"*c3是： "<< *c3 << endl; //x
+	const char *c4 = namee.c_str(); 
+	cout <<"*c4是： "<<*c4 << endl; //x
+
+	getchar();
+	return 0;
+	}
+   ```
+>>>>>>> b7f5f8fdeab925302daefb36a336ca88a5b7bc33
