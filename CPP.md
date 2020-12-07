@@ -393,7 +393,48 @@ for (auto it = s.begin(); it != s.end(); it++)
 ```
 
 ## 迭代器
+- 标准容器迭代器操作
+```cpp
+*iter	Return a reference to the element denoted by the iter
+iter->mem	equals to (*iter).mem
+++iter refer to the next element  
+--iter refer to the before element
+iter1 == iter2	iter1 and iter2 refer to the same element or they are the off-the-end iterator for the same container
+```
+- vector, string, array类容器
+```cpp
+iter + n	
+iter - n
+iter += n
+iter -= n
+iter1 - iter2
+>,>=,<,<=	//One iterator is less than another if it refers to an elemment that appears in the container before the one referred to by the other iterator
+```
+- 迭代器类型
+```
+vector<int>::iterator it; // it can read and write vector<int> elements
+string::iterator it2;     // it2 can read and write characters in a string
+vector<int>::const_iterator it3; // it3 can read but not write elements
+string::const_iterator it4;      // it4 can read but not write characters
+```
+A const_iterator behaves like a const pointer. Like a const pointer, a const_iterator may read but not write the element it denotes; an
+object of type iterator can both read and write. If a vector or string is const, we may use only its const_iterator type. With a nonconst vector or string,
+we can use either iterator or const_iterator.
 
+The type returned by begin and end depends on whether the object on which they
+operator is const. If the object is const, then begin and end return a
+const_iterator; if the object is not const, they return iterator:
+```
+vector<int> v;
+const vector<int> cv;
+auto it1 = v.begin();  // it1 has type vector<int>::iterator
+auto it2 = cv.begin(); // it2 has type vector<int>::const_iterator
+```
+Regardless of whether the vector (or string) is const, they return a const_iterator.
+```
+auto it3 = v.cbegin(); // it3 has type vector<int>::const_iterator
+```
+- 使用迭代器时不应向该迭代器指向的容器中增加元素
 ## 运算符
 ### rvalue和lvalue
 ### 计算顺序
