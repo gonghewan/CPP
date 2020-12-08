@@ -797,7 +797,7 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
 ## 函数
 - argument(实参) 与 parameter(形参)
   实参是函数调用的实际值，是形参的初始值
-- local variable 与 static
+- local variable 与 static variable
   ```
   size_t count_calls()
   {
@@ -842,7 +842,143 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
   cc -o a a.o libb.a
   以上都是将库文件直接复制到程序文件中，链接的文件既可以是.o文件，也可以是源代码文件，但是有一点特殊的是，当我们生成动态库的时候，就只能用源代码文件去生成动态库了，而不能用中间代码.o文件去生成，举个例子：a.c是主程序源代码，a.o是编译后的二进制文件，生成动态库文件libb.so用下面的命令: cc -shared -fPIC -o libb.so a.c, 而不能用cc -shared -fPIC -o libb.so a.o
   ```
+- 传参
+  - passed by value when argument is copied, the parameter and argument are independent objects (function is called by value).
+    
+  - passed by reference when parameter is alias for the object which is bound by argument (function is called by reference).
+    - 主要用途是避免低效的变量的复制
+    - 在parameter前加const可以避免在函数内部对该变量的改写，但要注意parameter的const level需比argument的const level高，如argument为low-level，parameter需大于low-level
+     ```
+      bool isShorter(const string &s1, const string &s2)
+      {
+           return s1.size() < s2.size();
+      }
+     ```
+    - 使用reference parameter返回更多的数据，cpp只允许返回一个对象，可以在父函数中定义变量保存更多的数据，将该引用作为parameter传入子函数在子函数内部对其赋值
+     ```
+     string::size_type find_char(const string &s, char c, string::size_type &occurs)
+     {
+	 auto ret = s.size(); // position of the first occurrence, if any
+	 occurs = 0; // set the occurrence count parameter
+	 for (decltype(ret) i = 0; i != s.size(); ++i) { 
+	 	if (s[i] == c) { 
+			if (ret == s.size())
+				 ret = i; // remember the first occurrence of c
+			++occurs; // increment the occurrence count
+		 } 
+	 }
+	 return ret; // count is returned implicitly in occurs
+     }
+     auto index = find_char(s, 'o', ctr);
+     ```
+     
+  ```
+  void reset(int &i){
+  i = 0;
+  }
+  int j = 42;
+  reset(j); // the value in j is changed.
+  cout << "j = " << j << endl;
+  ```
+  **int j; j就是一个int型的引用，j的内容其实是变量的地址，在运行时是按照地址读值**
+  - array的传参
+    ```
+    函数声明方式：
+    // each function has a single parameter of type const int*
+    void print(const int* k);
+    void print(const int(&arr)[]); // shows the intent that the function takes an array
+    void print(const int (&arr)[10]); // dimension for documentation purposes (at best)
+    
+    void print(int (&arr)[10])
+    {
+        for (auto elem : arr) cout << elem << endl;
+    }
+    ```
+    除了上述第三种还有以下方式声明数组长度：
+    ```
+    void print(const char *cp)
+    {
+        if (cp) // if cp is not a null pointer
+        while (*cp) // so long as the character it points to is not a null character
+        cout << *cp++; // print the character and advance the pointer
+    }
+    
+    void print(const int *beg, const int *end)
+    {
+    // print every element starting at beg up to but not including end
+    while (beg != end)
+    cout << *beg++ << endl; // print the current element
+    // and advance the pointer
+    }
+    print(begin(j), end(j));
+    
+    void print(const int ia[], size_t size)
+    {
+        for (size_t i = 0; i != size; ++i) { 
+	     cout << ia[i] << endl; 
+	     }
+    }
+    ```
+    **f(int &arr[10]) // error: declares arr as an array of references**
+    **f(int (&arr)[10]) // ok: arr is a reference to an array of ten ints**
+    多维数组
+    ```
+    void print(int (*matrix)[10], int rowSize) { /* . . . */ }
+    int *matrix[10]; // array of ten pointers
+    int (*matrix)[10]; // pointer to an array of ten ints
+    ```
+ - 向main函数传参
+   ```
+   assuming our main program is in an executable file named prog, we might pass options to the program as follow:
+   terminal: prog -d -o ofile data0
+   in prog:
+   int main(int argc, char **argv) { ... }
+   argv[0] = "prog"; // or argv[0] might point to an empty string
+   argv[1] = "-d";
+   argv[2] = "-o";
+   argv[3] = "ofile";
+   argv[4] = "data0";
+   argv[5] = 0;
+   ```
+ - 传递变长的参数
+   - initializer_list
+   ```
+   定义及相关函数：
+   initializer_list<T> lst;
+   initializer_list<T> lst{a,b,c}; //a,b,c should have the same type
+   lst2(lst);
+   lst2 = lst; //lst2 points to the same element of lst
+   lst.begin();
+   lst.end();
+   lst.size();
+   
+   例：
+   initializer_list<string> ls; // initializer_list of strings
+   initializer_list<int> li; // initializer_list of ints
+   void error_msg(initializer_list<string> il)
+   {
+    for (auto beg = il.begin(); beg != il.end(); ++beg) 
+         cout << *beg << " " ; cout << endl;
+   }
+   // expected, actual are strings
+   if (expected != actual)
+   error_msg({"functionX", expected, actual});
+   else
+   error_msg({"functionX", "okay"});
+   
+   
+   void error_msg(ErrCode e, initializer_list<string> il)
+   {
+      cout << e.msg() << ": "; for (const auto &elem : il) cout << elem << " " ;       cout << endl;
+   }
+   if (expected != actual) error_msg(ErrCode(42), {"functionX", expected， actual});
+   else
+   error_msg(ErrCode(0), {"functionX", "okay"});
 
+   ```
+   - ellipsis(仅应用于与C程序的接口中，不做赘述)
+   
+  
 ## 其它
  - char * 和 char[]的区别
    ```
