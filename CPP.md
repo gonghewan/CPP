@@ -527,8 +527,6 @@ A const_iterator behaves like a const pointer. Like a const pointer, a const_ite
 object of type iterator can both read and write. If a vector or string is const, we may use only its const_iterator type. With a nonconst vector or string,
 we can use either iterator or const_iterator.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 - 标准容器迭代器操作
 
 ```cpp
@@ -578,7 +576,6 @@ const vector<int> cv;
 auto it1 = v.begin();  // it1 has type vector<int>::iterator
 auto it2 = cv.begin(); // it2 has type vector<int>::const_iterator
 ```
-<<<<<<< HEAD
 
 Regardless of whether the vector (or string) is const, they return a const_iterator.
 
