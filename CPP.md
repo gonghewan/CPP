@@ -969,7 +969,8 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    
    void error_msg(ErrCode e, initializer_list<string> il)
    {
-      cout << e.msg() << ": "; for (const auto &elem : il) cout << elem << " " ;       cout << endl;
+      cout << e.msg() << ": "; for (const auto &elem : il) cout << elem << " " ;       
+      cout << endl;
    }
    if (expected != actual) error_msg(ErrCode(42), {"functionX", expected， actual});
    else
@@ -977,8 +978,43 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
 
    ```
    - ellipsis(仅应用于与C程序的接口中，不做赘述)
-   
-  
+- 返回值
+   - 无返回值 return;
+   用于声明void返回值的函数中，常用提前终止程序(类似break)，只有一种情况return expression的expression不为空：expression为返回值同为void的函数(即call func，void func(){...})
+   - 有返回值 return expression;
+   返回值类型要与函数声明中保持一致或可以强制转换为函数声明中的类型，**可以返回局部变量，但不要返回局部变量的指针！！！**，新标准中函数可以返回一个vector<T>={a,b,c,...}，main函数是一个例外，它可以不返回值，默认正确执行完成返回值为0。
+   ```
+   // disaster: this function returns a reference to a local object
+   const string &manip()
+   {
+      string ret;
+      // transform ret in some way
+      if (!ret.empty())
+      return ret; // WRONG: returning a reference to a local object!
+      else
+      return "Empty"; // WRONG: "Empty" is a local temporary string
+      }
+   ```
+   - 递归 (函数调用自身)
+   - 返回值为指向数组的指针
+   ```
+   旧版本中：
+	typedef int arrT[10]; // arrT is a synonym for the type array of ten ints
+        using arrtT = int[10]; // equivalent declaration of arrT; see § 2.5.1 (p. 68)
+        arrT* func(int i); // func returns a pointer to an array of five ints
+	int (*func(int i))[10];
+   新标准中：
+	// fcn takes an int argument and returns a pointer to an array of ten ints
+	auto func(int i) -> int(*)[10];
+	int odd[] = {1,3,5,7,9};
+	int even[] = {0,2,4,6,8};
+	// returns a pointer to an array of five int elements
+	decltype(odd) *arrPtr(int i)
+	{
+	 return (i % 2) ? &odd : &even; // returns a pointer to the array
+	}
+    ```
+
 ## 其它
  - char * 和 char[]的区别
    ```
