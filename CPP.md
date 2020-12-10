@@ -1058,7 +1058,108 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
       sz wd = 100; // hides the outer definition of wd but does not change the default
       window = screen(); // calls screen(ht(), 80, '*')
     }
-	
+- 内联函数
+  定义: 当函数被声明为内联函数之后, 编译器会将其内联展开, 而不是按通常的函数调用机制进行调用
+  优点: 当函数体比较小的时候, 内联该函数可以令目标代码更加高效. 对于存取函数以及其它函数体比较短, 性能关键的函数, 鼓励使用内联
+  缺点: 滥用内联将导致程序变慢. 内联可能使目标代码量或增或减, 这取决于内联函数的大小. 内联非常短小的存取函数通常会减少代码大小, 但内联一个相当大的函数将戏剧性的增加代码大小. 现代处理器由于         更好的利用了指令缓存, 小巧的代码往往执行更快
+  建议只有当函数只有 10 行甚至更少时才将其定义为内联函数。
+  ```
+  inline int max(int a, int b){
+        return a > b ? a : b;
+  }
+  则调用"cout<<max(a, b)<<endl;"在编译时展开为"cout<<(a > b ? a : b)<<endl;"
+- Debug
+  If NDEBUG is defined, assert does nothing. By default, NDEBUG is not defined, so, by default, assert performs a run-time check. We can “turn off” debugging by providing a   #define to define NDEBUG.
+  ```
+  $ CC -D NDEBUG main.C # use /D with the Microsoft compiler
+  ```
+  In C++:
+  - __func__ to print the name of the function we are debugging
+  - __FILE__ string literal containing the name of the file
+  - __LINE__ integer literal containing the current line number
+  - __TIME__ string literal containing the time the file was compiled
+  - __DATE__ string literal containing the date the file was compiled
+  For example:
+	if (word.size() < threshold) 
+	    cerr << "Error: " << __FILE__ << " : in function " << __func__ << " at line " << __LINE__ << endl << " Compiled on " << __DATE__ << " at " << __TIME__ << endl << " Word read was \"" << word << "\": Length too short" << endl;
+  Output:
+  Error: wdebug.cc : in function main at line 27
+         Compiled on Jul 11 2012 at 20:50:03
+         Word read was "foo": Length too short
+  ```
+- 函数重载的选择考虑因素（按优先级排序）
+  - 参数个数
+    - 在有合适的参数个数（包括含有未初始化的部分参数值的默认参数的函数）且参数类型不需转换即符合
+    - 参数个数不符合时且参数类型可以强制转换
+    - 上述情况都不符合，按照参数顺序依次匹配可选的函数，若按照第n个参数选择的最优匹配函数与前n-1个不同则报错
+- 函数指针
+    - 函数的类型由它的参数类型和返回值类型决定，与函数名无关
+    ```
+    // pf points to a function returning bool that takes two const string references
+    bool (*pf)(const string &, const string &); // uninitialized
+    // declares a function named pf that returns a bool*
+    bool *pf(const string &, const string &);
+    ```
+    - When we use the name of a function as a value, the function is automatically converted to a pointer. For example, we can assign the address of lengthCompare to pf as follows:
+    ```
+    pf = lengthCompare; // pf now points to the function named lengthCompare
+    pf = &lengthCompare; // equivalent assignment: address-of operator is optional
+    bool b1 = pf("hello", "goodbye"); // calls lengthCompare
+    bool b2 = (*pf)("hello", "goodbye"); // equivalent call
+    bool b3 = lengthCompare("hello", "goodbye"); // equivalent call
+    ```
+    - we can assign nullptr or a zero-valued integer constant expression to a function pointer to indicate that the pointer does not point to any function
+    ```
+    string::size_type sumLength(const string&, const string&);
+    bool cstringCompare(const char*, const char*);
+    pf = 0; // ok: pf points to no function
+    pf = sumLength; // error: return type differs
+    pf = cstringCompare; // error: parameter types differ
+    pf = lengthCompare; // ok: function and pointer types match exactly
+    ```
+    - 对于重载函数
+    ```
+    void ff(int*);
+    void ff(unsigned int);
+    void (*pf1)(unsigned int) = ff; // pf1 points to ff(unsigned)
+    void (*pf2)(int) = ff; // error: no ff with a matching parameter list
+    double (*pf3)(int*) = ff; // error: return type of ff and pf3 don't match
+		
+    ```
+    - 函数指针作为函数参数
+    ```
+    // third parameter is a function type and is automatically treated as a pointer to function
+    void useBigger(const string &s1, const string &s2, bool pf(const string &, const string &));
+    // equivalent declaration: explicitly define the parameter as a pointer to function
+    void useBigger(const string &s1, const string &s2, bool (*pf)(const string &, const string &));
+    // automatically converts the function lengthCompare to a pointer to function
+    useBigger(s1, s2, lengthCompare);
+    // Func and Func2 have function type
+    typedef bool Func(const string&, const string&);
+    typedef decltype(lengthCompare) Func2; // equivalent type
+    // FuncP and FuncP2 have pointer to function type
+    typedef bool(*FuncP)(const string&, const string&);
+    typedef decltype(lengthCompare) *FuncP2; // equivalent type
+    // equivalent declarations of useBigger using type aliases
+    void useBigger(const string&, const string&, Func);
+    void useBigger(const string&, const string&, FuncP2);
+    ```
+    - 函数指针作为函数返回值
+    ```
+    using F = int(int*, int); // F is a function type, not a pointer
+    using PF = int(*)(int*, int); // PF is a pointer type
+    PF f1(int); // ok: PF is a pointer to function; f1 returns a pointer to function
+    F f1(int); // error: F is a function type; f1 can't return a function
+    F *f1(int); // ok: explicitly specify that the return type is a pointer to function
+    // simplify the definition
+    1.auto f1(int) -> int (*)(int*, int); 
+    // getFcn returns a pointer to sumLength or to largerLength
+    2.decltype(sumLength) *getFcn(const string &);
+
+    ```
+
+    
+
 ## 其它
  - char * 和 char[]的区别
    ```
