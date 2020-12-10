@@ -1011,7 +1011,54 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
 	 return (i % 2) ? &odd : &even; // returns a pointer to the array
 	}
     ```
-
+- 函数重载
+  函数具有相同名字但参数不同，，在参数个数相同时参数类型必须不同，一个类的别名和这个类会被当作同一个类的参数，main函数不能重载，**返回值不同并不能区别两个函数达到重载目的**。
+  ```
+  // functions taking const and nonconst references or pointers have different parameters
+  // declarations for four independent, overloaded functions 
+  Record lookup(Account&); // function that takes a reference to Account
+  Record lookup(const Account&); // new function that takes a const reference
+  Record lookup(Account*); // new function, takes a pointer to Account
+  Record lookup(const Account*); // new function, takes a pointer to const
+  ```
+  在一个作用域内（如一个函数内部）定义的变量名如果和函数外的方法名或变量名重复，则在这个作用域中调用该函数时会默认调用该函数内部定义的变量或方法。
+  ```
+  void print(const string &);
+  void print(double); // overloads the print function
+  void print(int); // another overloaded instance
+  void fooBar2(int ival)
+  {
+      print("Value: "); // calls print(const string &)
+      print(ival); // calls print(int)
+      print(3.14); // calls print(double)
+  }
+  ```
+- 默认的构造参数
+  - <font color = 'red'>疑</font>
+    ```
+    For example, given:
+    // no default for the height or width parameters
+    string screen(int, int, char = ' ');
+    //we cannot change an already declared default value:
+    string screen(int, int, char = '*'); // error: redeclaration
+    //but we can add a default argument as follows:
+    string screen(int = 24, int = 80, char); 
+    ```
+  - 若默认参数在作用域外已有定义，在作用域内不会被该作用域新定义的重名变量所覆盖，但对作用域外定义的变量进行更改会影响函数的默认构造
+    ```
+    // the declarations of wd, def, and ht must appear outside a function
+    sz wd = 80;
+    char def = ' ';
+    sz ht();
+    string screen(sz = ht(), sz = wd, char = def);
+    string window = screen(); // calls screen(ht(), 80, ' ')
+    void f2()
+    {
+      def = '*'; // changes the value of a default argument
+      sz wd = 100; // hides the outer definition of wd but does not change the default
+      window = screen(); // calls screen(ht(), 80, '*')
+    }
+	
 ## 其它
  - char * 和 char[]的区别
    ```
