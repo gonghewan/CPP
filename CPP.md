@@ -1157,7 +1157,34 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
     2.decltype(sumLength) *getFcn(const string &);
 
     ```
-
+## 类
+ - const member function用于保证不改变该对象成员函数内部不对该对象进行改变，将不会改变对象内容的成员函数设置为常量成员函数，有助于提高类/结构体使用的灵活性
+   The fact that this is a pointer to const means that const member functions cannot change the object on which they are called. Thus, isbn may read but not write to the data members of the objects on which it is called.
+   isbn()后的const用于指明this应该是个指向const的常量指针，isbn()中没有对bookNo进行更改，所以bookNo在该函数中可以看作一个常量，而默认this是个常量指针，无法指向const。
+   ```
+   struct Sales_data {
+   // new members: operations on Sales_data objects
+   std::string isbn() const { return bookNo; } 
+   Sales_data& combine(const Sales_data&); 
+   double avg_price() const;
+   // data members are unchanged from § 2.6.1 (p. 72)
+   std::string bookNo; 
+   unsigned units_sold = 0; 
+   double revenue = 0.0;
+   };
+   // nonmember Sales_data interface functions
+   Sales_data add(const Sales_data&, const Sales_data&);
+   std::ostream &print(std::ostream&, const Sales_data&);
+   std::istream &read(std::istream&, Sales_data&);
+   
+   std::string isbn() const { return bookNo; } 相当于：
+   // pseudo-code illustration of how the implicit this pointer is used
+   // this code is illegal: we may not explicitly define the this pointer ourselves
+   // note that this is a pointer to const because isbn is a const member
+   std::string Sales_data::isbn(const Sales_data *const this)
+   { return this->isbn; }
+   ```
+   
     
 
 ## 其它
