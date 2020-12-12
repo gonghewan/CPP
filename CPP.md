@@ -1226,6 +1226,16 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
     Sales_data add(const Sales_data&, const Sales_data&);
     std::istream &read(std::istream&, Sales_data&);
     std::ostream &print(std::ostream&, const Sales_data&);
+    
+    //友元函数定义位置
+    struct X {
+    friend void f() { /* friend function can be defined in the class body */ }
+    X() { f(); } // error: no declaration for f
+    void g(); void h();
+    };
+    void X::g() { return f(); } // error: f hasn't been declared
+    void f(); // declares the function defined inside X
+    void X::h() { return f(); } // ok: declaration for f is now in scope
     ```  
  - 类自定义类型，必须在使用前声明，所以类成员变量的自定义类型通常在类的起始位置
    ```
@@ -1237,6 +1247,77 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    };
    ```
  - 对于一些简短的函数可以声明为inline
+ - mutable
+   使用该标签可以保证在任何函数（包括const函数）中变量都可以改变
+   ```
+   class Screen {
+   public:
+   void some_member() const;
+   private:
+   mutable size_t access_ctr; // may change even in a const object
+   // other members as before
+   };
+   void Screen::some_member() const
+   {
+        ++access_ctr; // keep a count of the calls to any member function
+   // whatever other work this member needs to do
+   }
+   
+   class Window_mgr {
+   private: 
+   // Screens this Window_mgr is tracking
+   // by default, a Window_mgr has one standard sized blank Screen
+   std::vector<Screen> screens{Screen(24, 80, ' ') };
+   };
+   ```
+ - return *this的函数
+   ```
+   class Screen {
+   public:
+   Screen &set(char); Screen &set(pos, pos, char);
+   // other members as before
+   };
+   inline Screen &Screen::set(char c)
+   {
+       contents[cursor] = c; // set the new value at the current cursor location
+       return *this; // return this object as an lvalue
+   }
+   inline Screen &Screen::set(pos r, pos col, char ch)
+   {
+       contents[r*width + col] = ch; // set specified location to given value
+       return *this; // return this object as an lvalue
+   }
+   注意区别：
+   // move the cursor to a given position, and set that character
+   myScreen.move(4,0).set('#');
+   
+   // if move returns Screen not Screen&，set改变的将是一个新的screen对象，而不是原来的那个
+   Screen temp = myScreen.move(4,0); // the return value would be copied
+   temp.set('#'); // the contents inside myScreen would be unchanged
+   ```
+ - we can only call const member functions on a const object
+ - 类中的声明中涉及的变量类型首先在类scope的该变量出现的位置之前寻找，如果没找到就到scope外找，而类的函数在整个类全部读完后才开始看函数内部的内容
+  ```
+  typedef double Money;
+  string bal;
+  class Account {
+  public:
+         Money balance() { return bal; } //Money is find in [typedef double Money]; bal is find in [Money bal]
+  private:
+         Money bal; // ...
+  };
+  ```
+ - 当在类scope外定义了一个类型name时，不可以再在类内部重复为name定义，若name不作为类型而是普通变量名则可以重复定义
+   ```
+   typedef double Money;
+   class Account {
+   public:
+          Money balance() { return bal; } // uses Money from the outer scope
+   private:
+          typedef double Money; // error: cannot redefine Money 
+          Money bal; // ... 
+   };
+   ```
 ## 其它
  - char * 和 char[]的区别
    ```
