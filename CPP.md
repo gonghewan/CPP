@@ -1161,6 +1161,7 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
  - const member function用于保证不改变该对象成员函数内部不对该对象进行改变，将不会改变对象内容的成员函数设置为常量成员函数，有助于提高类/结构体使用的灵活性
    The fact that this is a pointer to const means that const member functions cannot change the object on which they are called. Thus, isbn may read but not write to the data members of the objects on which it is called.
    isbn()后的const用于指明this应该是个指向const的常量指针，isbn()中没有对bookNo进行更改，所以bookNo在该函数中可以看作一个常量，而默认this是个常量指针，无法指向const。
+   如std::string isbn() const { bookNo="111";return bookNo; }//error:bookNo is a const       std::string isbn() { bookNo="111";return bookNo; } //ok
    ```
    struct Sales_data {
    // new members: operations on Sales_data objects
@@ -1184,7 +1185,25 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    std::string Sales_data::isbn(const Sales_data *const this)
    { return this->isbn; }
    ```
-   
+ - 当调用类的成员函数时，实际上传递了this（一个指向当前对象的地址的常量指针）作为隐含参数，total.isbn() ==> std::string isbn() const { return this->bookNo; }
+ - 当类没有定义构造函数时，使用默认的构造函数:xx()，若定义了构造函数则系统不会为该类产生默认构造函数，也可自定义使用系统默认的构造函数 struct Sales_data { Sales_data() = default;...}
+   构造函数可以在函数体内部定义也可以在函数体外定义
+   ```
+   Sales_data(const std::string &s): bookNo(s) { }
+   Sales_data(const std::string &s, unsigned n, double p):
+   bookNo(s), units_sold(n), revenue(p*n) { }
+   // has the same behavior as the original constructor defined above
+   Sales_data(const std::string &s):
+   bookNo(s), units_sold(0), revenue(0){ }
+   //outside the class
+   Sales_data::Sales_data(std::istream &is)
+   {
+        read(is, *this); // read will read a transaction from is into this object
+   }
+   ```
+ - 在函数体内部定义（！！！注意，定义，而非声明）的成员函数编译时会处理为inline形式，而函数体外部则默认不会
+ - public, private
+   当一个类全是public的成员时，其等同于一个结构体
     
 
 ## 其它
