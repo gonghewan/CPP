@@ -1204,7 +1204,29 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
  - 在函数体内部定义（！！！注意，定义，而非声明）的成员函数编译时会处理为inline形式，而函数体外部则默认不会
  - public, private
    当一个类全是public的成员时，其等同于一个结构体
-    
+ - friends
+   友元机制允许类的非公有成员被一个类或者函数访问，友元按类型分为三种：普通非类成员函数作为友元,类的成员函数作为友元，类作为友元。友元包括友元的声明以及友元的定义。友元的声明默认为了extern，就是说友元类或者友元函数的作用域已经扩展到了包含该类定义的作用域，所以即便我们在类的内部定义友元函数也是没有关系的。友元可以是一个函数，该函数被称为友元函数；友元也可以是一个类，该类被称为友元类。友元函数的特点是能够访问类中的私有成员的非成员函数。友元函数从语法上看，它与普通函数一样，即在定义上和调用上与普通函数一样。友元函数的实现可以在类外定义，但必须在类内部声明，
+友元函数是可以直接访问类的私有成员的非成员函数。它是定义在类外的普通函数，它不属于任何类，但需要在类的定义中加以声明，声明时只需在友元的名称前加上关键字friend。
+    ```
+    class Sales_data {
+    // friend declarations for nonmember Sales_data operations added
+    friend Sales_data add(const Sales_data&, const Sales_data&);
+    friend std::istream &read(std::istream&, Sales_data&);
+    friend std::ostream &print(std::ostream&, const Sales_data&);
+    // other members and access specifiers as before
+    public:
+    Sales_data() = default; Sales_data(const std::string &s, unsigned n, double p): bookNo(s), units_sold(n), revenue(p*n) { } 
+    Sales_data(const std::string &s): bookNo(s) { } 
+    Sales_data(std::istream&); std::string isbn() const { return bookNo; } 
+    Sales_data &combine(const Sales_data&);
+    private:
+    std::string bookNo; unsigned units_sold = 0; double revenue = 0.0;
+    };
+    // declarations for nonmember parts of the Sales_data interface
+    Sales_data add(const Sales_data&, const Sales_data&);
+    std::istream &read(std::istream&, Sales_data&);
+    std::ostream &print(std::ostream&, const Sales_data&);
+    ```  
 
 ## 其它
  - char * 和 char[]的区别
