@@ -1319,6 +1319,63 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
           Money bal; // ... 
    };
    ```
+ - 区别构造器初始化和赋值
+   ```
+   class ConstRef {
+   public:
+          ConstRef(int ii);
+   private:
+          int i; 
+	  const int ci; 
+	  int &ri;
+   };
+   // error: ci and ri must be initialized 
+   ConstRef::ConstRef(int ii) 
+   { // assignments:
+       i = ii; // ok
+       ci = ii; // error: cannot assign to a const 
+       ri = i; // error: ri was never initialized
+   }
+   // ok: explicitly initialize reference and const members
+   ConstRef::ConstRef(int ii): i(ii), ci(ii), ri(i) { }
+   ```
+ - 参数传递顺序最好与函数参数顺序相同
+ - delegating constructors
+   ```
+   class Sales_data {
+   public:
+   // nondelegating constructor initializes members from corresponding arguments
+   Sales_data(std::string s, unsigned cnt, double price): bookNo(s), units_sold(cnt), revenue(cnt*price) {}
+   // remaining constructors all delegate to another constructor
+   Sales_data(): Sales_data("", 0, 0) {} 
+   Sales_data(std::string s): Sales_data(s, 0,0) {} 
+   Sales_data(std::istream &is): Sales_data() { read(is, *this); }
+   // other members as before
+   };
+   ```
+ - default constructor的作用
+   ```
+   class NoDefault {
+   public:
+         NoDefault(const std::string&);
+         // additional members follow, but no other constructors
+   };
+   struct A { // my_mem is public by default; see § 7.2 (p. 268)
+   NoDefault my_mem;
+   };
+   A a; // error: cannot synthesize a constructor for A
+   struct B {
+   B() {} // error: no initializer for b_member
+   NoDefault b_member;
+   };
+   //In practice, it is almost always right to provide a default constructor if other constructors are being defined.
+   ```
+ - aggregate class
+   • All of its data members are public
+   • It does not define any constructors
+   • It has no in-class initializers
+   • It has no base classes or virtual functions
+ - 
 ## 其它
  - char * 和 char[]的区别
    ```
