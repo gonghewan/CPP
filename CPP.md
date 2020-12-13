@@ -1375,7 +1375,22 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
    • It does not define any constructors
    • It has no in-class initializers
    • It has no base classes or virtual functions
- - 
+ - static成员变量或成员函数，在求类的大小时不包含在内，非整型静态变量不能在类内初始化
+   不绑定任一特定的对象，而是属于整个类所共有，调用时使用类名::变量名或类名::函数名，也就是说没有*this
+   As with any other member function, we can define a static member function inside or outside of the class body. When we define a static member outside the class, we do not repeat the static keyword. The keyword appears only with the declaration inside the class body.
+   ```
+   class Account {
+   public:
+         void calculate() { amount += amount * interestRate; } 
+	 static double rate() { return interestRate; } 
+	 static void rate(double);
+   private:
+         std::string owner; 
+	 double amount; 
+	 static double interestRate; 
+	 static double initRate();
+   };
+   ```
 ## 其它
  - char * 和 char[]的区别
    ```
