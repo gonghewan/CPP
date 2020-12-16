@@ -2,9 +2,9 @@
 ## I/O
 - 关系
   istream----->ifstream----->istringstream
-     |
+     
   iostream---->iofstream---->iostringstream
-     | 
+     
   ostream----->ofstream----->ostringstream
      
   streambuf--->filebuf------>stringbuf
