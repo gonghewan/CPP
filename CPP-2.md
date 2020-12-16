@@ -10,8 +10,8 @@
   streambuf--->filebuf------>stringbuf
   cin : 一个istream对象，从标准输入中读取数据，注意为字节读取
   cout :一个ostream对象，从标准输出中写入数据
-  >> : 用来从一个istream对象读取输入数据，如cin >> x，表示输入数据流到x
-  << : 用来向一个ostream对象写入输出数据，如cout << x，表示x输出到ostream对象
+  \>\> : 用来从一个istream对象读取输入数据，如cin \>\> x，表示输入数据流到x
+  \<\< : 用来向一个ostream对象写入输出数据，如cout \<\< x，表示x输出到ostream对象
   getline(string库中)：从is中读取字符串到str中，其中delim为字符截至标志
   ```
   istream& getline (istream& is, string& str, char delim);
