@@ -352,3 +352,32 @@
           }
         }
         ```
+    - array 
+      与 vector 类型相似，数组也可以保存某种类型的一组对象；而它们的区别在于，数组的长度是固定的。数组一经创建，就不允许添加新的元素。指针则可以像迭代器一样用于遍历和检查数组中的元素。设计良好的程序只有在强调速度时才在类实现的内部使用数组和指针。
+      ```
+      //size是array的类型的组成部分，即array的类型由其元素的类型和其size共同决定
+      array<int, 10>::size_type i; // array type includes element type and size
+      array<int>::size_type j; // error: array<int> is not a type
+      ```
+      It is worth noting that although we cannot copy or assign objects of built-in array types, there is no such restriction on array:
+      int digs[10] = {0,1,2,3,4,5,6,7,8,9};
+      int cpy[10] = digs; // error: no copy or assignment for built-in arrays
+      array<int, 10> digits = {0,1,2,3,4,5,6,7,8,9};
+      array<int, 10> copy = digits; // ok: so long as array types match
+    - 迭代器
+      - 种类
+        ```
+        list<string> a = {"Milton", "Shakespeare", "Austen"};
+        auto it1 = a.begin(); // list<string>::iterator
+        auto it2 = a.rbegin(); // list<string>::reverse_iterator
+        auto it3 = a.cbegin(); // list<string>::const_iterator
+        auto it4 = a.crbegin();// list<string>::const_reverse_iterator
+        ```
+    - swap函数
+      ```
+      vector<string> svec1(10); // vector with ten elements
+      vector<string> svec2(24); // vector with 24 elements
+      swap(svec1, svec2);
+      ```
+      After the swap, svec1 contains 24 string elements and svec2 contains ten. With the exception of arrays, swapping two containers is guaranteed to be fast—the elements themselves are not swapped; internal data structures are swapped. For example, had iter denoted the string at position svec1 [3] before the swap, it will denote the element at position svec2[3] after the swap. Differently from the containers, a call to swap on a string may invalidate iterators, references and pointers.In the new library, the containers offer both a member and nonmember version of swap. Earlier versions of the library defined only the member version of swap. The nonmember swap is of most  importance in generic programs. As a matter of habit, it is best to use the nonmember version of swap.
+      
