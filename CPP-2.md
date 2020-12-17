@@ -380,4 +380,8 @@
       swap(svec1, svec2);
       ```
       After the swap, svec1 contains 24 string elements and svec2 contains ten. With the exception of arrays, swapping two containers is guaranteed to be fast—the elements themselves are not swapped; internal data structures are swapped. For example, had iter denoted the string at position svec1 [3] before the swap, it will denote the element at position svec2[3] after the swap. Differently from the containers, a call to swap on a string may invalidate iterators, references and pointers.In the new library, the containers offer both a member and nonmember version of swap. Earlier versions of the library defined only the member version of swap. The nonmember swap is of most  importance in generic programs. As a matter of habit, it is best to use the nonmember version of swap.
+    - 判断两个容器是否相等，We can use a relational operator to compare two containers only if the appropriate comparison operator is defined for the element type.
+      - c1==c2 <==>size和所有的element全都相同
+      - c1<c2  <==> c1的size小于c2的size且c1的所有element都和c2的相同
+      - 如果两个容器都不是另一个容器的初始子序列，那么比较取决于比较第一个不相等的element
       
