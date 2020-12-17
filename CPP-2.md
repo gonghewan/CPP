@@ -164,3 +164,55 @@
                 cerr << "input error:" << info.name << " " << badNums.str() << endl;
         }
         ```
+## 容器
+  - 顺序容器
+    - vector
+      - 初始化   
+        最常用的有:1. 默认初始化，这里vector为空；2.copy初始化，用另一个vector初始化该vector 3.列表初始化。很少在初始化vector的时候去设定它的size，因为vector的push_bask非常高效。
+        ```
+        // T 表示实例化类模板时使用的类型
+        vector<T> v1             　  　// 默认初始化, 此时v1为空
+        vector<T> v1(v2)              // 执行的copy初始化，此时v1与v2的内容相同
+        vector<T> v1 = v2      　　   // 与上面相同，都会执行copy构造函数
+        vector<T> v1(n)           　  // 此时v1的size大小为n ,它里面的值是根据T的类型进行默认初始化的
+        vector<T> v1(n, a)        　  // v1的初始化为n个值为a的元素
+        vector<T> v1{a, b, c}    　 　// 列表初始化，v1内现在的元素就是a, b, c （这是c++11标准新入的）
+        vector<T> v1 = {a, b, c} 　　 // 与上面相同
+        ```
+      - 常用操作
+        ```
+        //属性操作
+        v1.size()　　　　　　//v1内已经存放的元素的数目
+        v1.capacity()　　　　// v1现有的在存储容量（不再一次进行扩张内存空间的前提下）
+        v1.empty()　　　　　// 判断v1是否为空
+        v1.max_size()　　　 // 返回vector可以存放的最大元素个数，一般这个数很大，因为vector可以不断调整容量大小。
+        v1.shrink_to_fit()　　// 该函数会把v1的capacity()的大小压缩到size()大小，即释放多余的内存空间。
+        //访问操作：访问操作都会返回引用，通过它，我们可以修改vector中的值。
+        v1[n]　　　　　　　　// 通过下标进行访问vector中的元素的引用 （下标一定要存在 ，否则未定义，软件直接崩了）
+        v1.at(n)　　　　　　　// 与上面类似，返回下标为n的元素的引用，不同的是，如果下标不存在，它会抛出out_of_range的异常。它是安全的，建议使用它。
+        v1.front()　　　　　　// 返回vector中头部的元素的引用（使用时，一定要进行非空判断）
+        v1.back()　　　　　　// 返回vector中尾部的元素 引用（使用时，一定要进行非空判断）
+        //添加操作
+        v1.push_back(a)　　　　　　　　//在迭代器的尾部添加一个元素
+        //v1.push_front(a)　　　　　　　　// vector不支持这个操作
+        v1.insert(iter,  a)　　　　　　　// 将元素a 插入到迭代器指定的位置的前面，返回新插入元素的迭代器（在c++11标准之前的版本，返回void)
+        v1.insert(iter, iter1, iter2)　　//把迭代器[iterator1, iterator2]对应的元素插入到迭代器iterator之前的位置，返回新插入的第一个元素的迭代器（在c++11标准之前的版本， 返回空）。
+        在c++11标准中，引入了emplac_front()、 emplace()、emplace_back(), 它们分别与push_front()、insert()、 push_back()相对应，用法与完成的动作作完全相同，但是实现不一样。 push_front()、insert()各push_back()是对元素使用copy操作来完成的，而emplac_front()、 emplace()和emplace_back()是对元素使用构造来完成的，后者的效率更高，避免了不必要的操作。因此，在以后更后推荐使用它们。
+        //删除操作
+        v1.erase(iterator)　　　　　// 删除人人迭代器指定的元素，返回被删除元素之后的元素的迭代器。（效率很低，最好别用）
+        v1.pop_front() 　　　　　　//vector不支持这个操作
+        v1.pop_back()　　　　　　//删除vector尾部的元素 ， 返回void类型 (使用前，一定要记得非空判断）
+        v1.clear()　　　　　　　　 //清空所有元素
+        //替换操作
+        v1.assign({初始化列表})　　　　// 相当于赋值操作
+        v1.assign(n, T)　　　　　　　　// 此操作与初始化时的操作类似，用n个T类型的元素对v1进行赋值
+        v1.assign(iter1, iter2)　　　// 使用迭代器[iter1, iter2]区间内的元素进行赋值（该迭代器别指向自身就可以），另外，只要迭代器指的元素类型相同即可（存放元素的容器不同，例如：可以用list容器内的值对vector容器进行assign操作，而用 "=" 绝对做不到的。
+        v1.swap(v2)　　　　　　// 交换v1与v2中的元素。  swap操作速度很快，因为它是通过改变v1与v2两个容器内的数据结构（可能是类似指针之类的与v1和v2的绑定）完成的，不会对容器内的每一个元素进行交换。 这样做，不仅速度快，并且指向原容器的迭代器、引用以及指针等仍然有效，因为原始的数据没有变。c++ primer中建议使用非成员版本的swap()函数，它在范型编程中很重要。
+        ```
+      - 小结
+         1. vector容器最重要的特性是：它在一段连续的内存空间中存储元素, 在常量时间内对vector容器进行随机访问，高效的在vector的尾部进行添加与删除操作，在中间或头部添加与删除元素的效率很低。
+         2. 对vector进行增加与删除元素的操作，都会使迭代器、指针、引用失效（可能有时候它们仍然有效，但不能作这样假设）。所以使用vector的迭代器、引用和指针时，尽量避免增加与删除元素的操作。
+         3. 对于vector的迭代器，它除了可以进行++iter与--iter的操作之外，还可以进行算术运算，例如：iter + n、::difference_type a = iter1 - iter2 //它的返回类型为 ::difference_type,例如vector<int>::difference_type （另一个也支持迭代器算术运算的容器为string)
+    - string容器
+      string与vector类似，但是string不是一种类模板，而就是一种类型，因为它专门用于存放字符的（存放的元素类型已经明确），所以没有设计为类模板。它的所有特性与vector相同，包括存储在连续的空间／快速随机访问／高效在尾部插入与删除／低效在中间插入与删除等， string的迭代器也支持算术运算。可以把string类型看作为vector<char>类型，vector的所有特性都适合于string类型。
+      - 特性
