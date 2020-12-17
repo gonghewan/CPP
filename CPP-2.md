@@ -216,3 +216,139 @@
     - string容器
       string与vector类似，但是string不是一种类模板，而就是一种类型，因为它专门用于存放字符的（存放的元素类型已经明确），所以没有设计为类模板。它的所有特性与vector相同，包括存储在连续的空间／快速随机访问／高效在尾部插入与删除／低效在中间插入与删除等， string的迭代器也支持算术运算。可以把string类型看作为vector<char>类型，vector的所有特性都适合于string类型。
       - 特性
+        - 初始化
+          ```
+          string a("xiaoming")
+          string a = "xiaoming"
+          ```
+        - string中包含的专有的操作（相对于vector来说）
+          ```
+          string的添加与替换：
+          在string中，增加了append(）与 replace()函数
+          str.append(args)　　　　// 在尾部添加一个字符或一个字符
+          str.replace(pos, args)　　　　// 在尾部添加一个字符或一个字符 ,它的重载函数很多,共16个
+          string的访问子字符串
+          str.substr(_pos, n)　　//该函数可以获得原字符串中的部分字符, 从pos开始的n个字符，当_pos超过范围时，会抛出out_of_range的异常
+          
+          str的搜索操作：
+          str.find(args)　　//查找args 第一次出现的位置
+          str.rfind(args)　　//查找args最后一次出现的位置
+          str.find_first_of(args)　　　//搜索的是字符， 第一个是args里的字符的位置
+          str.find_last_of(args)　　　// 搜索的是字符， 最后一个是args里的字符的位置
+          str.find_first_not_of()　　// 搜索的是字符，第一个不是args里的字符的位置
+          str.find_last_not_of()　　// 搜索的是字符， 最后一个不是args里的字符的位置
+          
+          str的大小操作：
+          str.length()　　　// 该函数与str.size()函数完成一样，只是名字不同而已罢了。只所以这样搞的原因，可能开发人员感觉length更适合字串符，size更适合容器吧
+          
+          c字符串的转换函数
+          1. 由数值转换为字符串：
+          to_string(val): 
+          2. 由字符串转换为数值：（要转换的string的第一个非空白符必须是数值中可能出现的字符，处理直到不可能转换为数值的字符为止）
+          stoi(str, pos, base)  　　// 字符串转换为整型，其中str表示字符串，pos用于表示转换后截断的第一个非数值字符的下标, base表数值的基数，默认为10，即10进制数。
+          stol(str, pos, base)　　　　// 转换为long
+          stoul(str, pos, base)　　　　// 转换为 unsigned long
+          stoll(str, pos, base)　　　　// 转换为 long long
+          stoull(str, pos, base)　　　// 转换为unsigned long long
+          stof(str, pos)　　　　　　// 转换为float
+          stod(str, pos,)　　　　　// 转换为double
+          stold(str, pos,)　　　　　// 转换为long double
+          
+          对字符的操作：（在cctype头文件中，并不属于string头文件的范围，但是关系很紧密的），以下内容来自:c++ primer 第五版p82, 只写出部分常用来的(字母：alpha, 数字：number或digit)
+          isalnum(c)　　// 当为字母或数字时为真
+          isalpha(c)　　// 当为字母时为真
+          isdigit(c)　　// 当为数字时真
+          islower(c)　　// 当为小写字母时为真
+          issupper(c)　　// 当为大写字母时为真
+          isspace(c)　　// 当为空格时为真
+          tolower(c)　　// 转换为小写字母， 当本身为小写字母时，原样输出
+          toupper(c)　　// 转换为大写字母， 当本身为大写字母时，原样输出
+          ```
+    - list容器
+      与vector和string相比，list内部的实现为一个双向链表，它的元素不是存储在连续的内存空间中，而是非连续的，这就决定了它不能在常量时间内完成对元素的随机访问，只能从头到尾的遍历一遍。因为它是用双向链表实现的，所以，它的一大特性就是它的迭代器永远不会变为无效（除非这段空间不存在了），即无论增加、删除操作，都不会破坏迭代器。与向量(vectors)相比, 它允许快速的插入和删除，但是随机访问比较慢。list不支持随机存取，要访问第n个元素，必须先遍历前n-1个元素才能访问第n个元素。因此，list没有下标[]操作，也没有at()接口。list的迭代器没有重载+n操作，但是重载了++, --。
+      list与vector的差别：
+      1. list支持push_front()、pop_front()操作
+      2. list不支持vector中的随机访问操作，即使用v1.at( )和v1[ ] 操作
+      3. list的删除与增加元素的操作不会破坏迭代器，而 vector与string 会使迭代器失效
+      4. list 内部增加了一个sort()的方法，用于实现排序
+      5. list增加了一个类似insert()的函数，为splice()：该函数可以实现在常数时间内把一个list插入到另一个list内，与insert()的区别在于insert是进行copy, 而splice()直接操作的链表的指针指向，它有好几个重载函数
+      6. list的去重复函数unique()：函数的作用是去除连续重复的元素，参数即可以为空，也可以传入一个二元谓词，用于确定相等的比较算法，配合上sort()函数使用
+      7. list的合并函数merge(): 该函数就是合并两个list，它在合并过程中会在两个链表之间进行来回的比较，如果原来的两个list是有顺序的，合并之后的结果也是有序的，如果合并之前是无序的，合并之后也是无序的
+    - forward list 单向链表
+      略
+    - deque 是一个双端的数组，而vector 是单端的
+      - 特点
+        deque在接口上和vector非常相似，在许多操作的地方可以直接替换。deque可以随机存取元素（支持索引值直接存取，用[]操作符或at()方法）。deque头部和尾部添加或移除元素都非常快速, 但是在中部安插元素或移除元素比较费时。使用时，包含头文件：#include <deque>。
+      - 常见操作
+        ```
+        // 下标方式获取里面的值或赋值
+        d1.at(0) = 0;
+        int d = d1[1];
+        // 头部增加
+        d1.push_front(1);
+        // 尾部增加
+        d1.push_back(2);
+        // 头部删除
+        d1.pop_front();
+        // 尾部删去
+        d1.pop_back();
+        // 获取第一个元素
+        d1.front();
+        // 获取最后一个元素
+        d1.back();
+        // 使用迭代器方式输出
+        deque<int>::iterator it = d1.begin();
+        for (; it != d1.end(); it++) {
+          cout << *it << " ";
+        }
+        // 常量迭代器
+        deque<int>::const_iterator cit = d1.cbegin();
+        for( ; cit!=d1.cend(); cit++){
+          cout<<*cit;
+          cout<<" ";
+        }
+        // 逆转的迭代器
+        deque<int>::reverse_iterator rit=d1.rbegin();
+        for(; rit!=d1.rend(); ++rit){
+          cout<<*rit;
+          cout<<" ";
+        }
+        // 第一个迭代器
+        d1.begin();
+        // 最后一个迭代的下一个迭代器
+        d1.end();
+        // 把d1的全部元素都赋值给d2
+        d2.assign(d1.begin(), d1.end());
+        // 给d2赋值6个666
+        d2.assign(6, 666);
+        // 调用赋值运算符重载 把d1的全部元素都赋值给d2
+        d2 = d1;
+        // 两个容器互换元素
+        d2.swap(d1);
+        // 获取容器元素的个数
+        d1.size();
+        // 设置容器的长度，如果短了则删去，多了则用0赋值
+        d1.resize(5);
+        // 设置容器的长度，多出来的部分用5赋值
+        d1.resize(15, 5);
+        // 在d1的开头位置插入一个5
+        d1.insert(d1.begin(), 5);
+        // 在d1的第二个位置开始插入两个888
+        d1.insert(d1.begin() + 1, 2, 888);
+        // 在第一的开头位置插入d2的所有元素
+        d1.insert(d1.begin(), d2.begin(), d2.end());
+        // 删除第二个元素
+        d1.erase(d1.begin() + 1);
+        // 删除一个区间的元素
+        d1.erase(d1.begin() + 1, d1.begin() + 3);
+        // 删除所有的元素
+        d1.clear();
+        // 典型的删除容器里的某个元素，vector也一样
+        for (deque<int>::iterator it = d1.begin(); it != d1.end();) {
+        if (*it == 4) {
+            it = d1.erase(it);
+          } else {
+            it++;
+          }
+        }
+        ```
