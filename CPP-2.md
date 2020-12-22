@@ -384,4 +384,21 @@
       - c1==c2 <==>size和所有的element全都相同
       - c1<c2  <==> c1的size小于c2的size且c1的所有element都和c2的相同
       - 如果两个容器都不是另一个容器的初始子序列，那么比较取决于比较第一个不相等的element
+    - emplace_front emplace_back与push_front push_back的区别
+      emplace_xx会在当前内存空间创建一个新对象，而push不能
+      ```
+      // construct a Sales_data object at the end of c uses the three-argument Sales_data constructor
+      c.emplace_back("978-0590353403", 25, 15.99);
+      // error: there is no version of push_back that takes three arguments
+      c.push_back("978-0590353403", 25, 15.99);
+      // ok: we create a temporary Sales_data object to pass to push_back
+      c.push_back(Sales_data("978-0590353403", 25, 15.99));
+      // iter refers to an element in c, which holds Sales_data elements
+      c.emplace_back(); // uses the Sales_data default constructor
+      c.emplace(iter, "999-999999999"); // uses Sales_data(string)
+      // uses the Sales_data constructor that takes an ISBN, a count, and a price
+      c.emplace_front("978-0590353403", 25, 15.99);
+      ```
+  
+  
       
