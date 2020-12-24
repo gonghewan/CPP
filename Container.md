@@ -5,14 +5,14 @@
     
    实际上是 | 1 -> | 2 -> | 3 ->| XX ->|
       
-             ^                    ^
+            ^                    ^
               
-             |                    |
+            |                    |
               
            list.begin()         list.end()     返回的是iterator，*iter获取内容
-             ^              ^
+            ^              ^
               
-             |              |
+            |              |
                
            list.front()   list.back()        返回的是引用
    在一些编译器中可能在输出list.end()的解引用时输出的是list的最后一个有内容的元素（例子中的“3”），有的可能输出空
@@ -30,6 +30,7 @@
  - 随机存取
    vector.at(n)要比vector[n]安全
  - 有增删的遍历
+ 
    错误做法：
    ```
     // disaster: the behavior of this loop is undefined
