@@ -26,5 +26,30 @@
          v2 = 0; // no change to the element in c
       }
       ```
-  
-  
+### vector
+    - 随机存取
+      vector.at(n)要比vector[n]安全
+    - 有增删的遍历
+       错误做法：
+       ```
+       // disaster: the behavior of this loop is undefined
+       auto begin = v.begin(),
+       end = v.end(); // bad idea, saving the value of the end iterator
+       while (begin != end) {
+       // do some processing
+       // insert the new value and reassign begin, which otherwise would be invalid
+       ++begin; // advance begin because we want to insert after this element
+       begin = v.insert(begin, 42); // insert the new value
+       ++begin; // advance begin past the element we just added
+       }
+       ```
+       正确做法：
+       ```
+       // safer: recalculate end on each trip whenever the loop adds/erases elements
+      while (begin != v.end()) {
+       // do some processing
+       ++begin; // advance begin because we want to insert after this element
+       begin = v.insert(begin, 42); // insert the new value
+       ++begin; // advance begin past the element we just added
+      }
+       ```
