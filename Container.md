@@ -52,3 +52,7 @@
     ++begin; // advance begin past the element we just added
     }
     ```
+### Container Adaptor
+ - stack 
+ - queue 先进先出
+ - priority_queue 最新加入的优先级最低
