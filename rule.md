@@ -12,4 +12,5 @@
   for (auto &c: str) //c引用str中的每个char
       cout << c << endl;
   ```
+  - int j; j就是一个int型的引用，j的内容其实是变量的地址，在运行时是按照地址读值
 
