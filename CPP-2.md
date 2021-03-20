@@ -400,5 +400,190 @@
       c.emplace_front("978-0590353403", 25, 15.99);
       ```
   
+  - 关联容器
+   - map (key-value)
+    初始化：{{key,value},……}
+    map<string,string> word_count; // empty 
+    map<string,string> authors = { {"Joyce", "James"}, {"Austen", "Jane"},{"Dickens", "Charles"} };
+    自定义比较函数
+  ```cpp
+  // 比较函数
+  struct MyCmp {
+  	bool operator()(string l, string r) const { return strcasecmp(l.c_str(), r.c_str()) < 0; }
+  };
+  
+  int main() {
+  	map<string, int, MyCmp> mymap;
+  	mymap["key"] = 0;
+  	map<string, int, MyCmp>::iterator myit = mymap.find("KEY");
+  	......
+  }
+  ```
+
+  - set  (key)
+   初始化:   set<string> exclude = {"the", "but", "and", "or", "an", "a", "The", "But", "And", "Or", "An", "A"}; // three elements; authors maps last name to first 
+   自定义比较函数，其实就是对key的类型重写其比较函数
+  
+  ```
+  class CTest {
+  public:
+          CTest() { num = 0; str = ""; }
+          CTest(int _num, string _str) { num = _num; str = _str; }
+          string str;
+          int num;
+  };
+  
+  class CTestCmp {
+  public:
+          bool operator() (const CTest& lc, const CTest& rc) {
+                  //return !!(lc.num < rc.num);
+                  return !!(lc.str < rc.str);
+          }
+  };
+  
+  typedef set<CTest, CTestCmp> CTestSet;
+  int main(int argc, char* argv[])
+  {
+          CTestSet _set;
+          ......
+  }
+  ```
+  
+  - 对于有序的map和set，可以自定义其key的比较函数，但是要求严格小于，若两个key相等，则被视为同一个key, key一旦出现在map和set里只能删除不能改变
+
+  - 定义在utility的pair类型，pair类型是一个template类型，声明时要说明类型，如pair<string,int> p; pair的两个成员变量都是public的，都可以通过pair.first和pair.second来访问
+
+  - 别名，查找，copy（将sequencial和associative container合并为任一种容器），插入
+
+    ```
+    set<string>::value_type v1; // v1 is a string
+    set<string>::key_type v2; // v2 is a string
+    map<string, int>::value_type v3; // v3 is a pair<const string, int>
+    map<string, int>::key_type v4; // v4 is a string
+    map<string, int>::mapped_type v5; // v5 is an int
+    // get an iterator to an element in word_count
+    auto map_it = word_count.begin();
+    // *map_it is a reference to a pair<const string, size_t> object
+    cout << map_it->first; // prints the key for this element
+    cout << " " << map_it->second; // prints the value of the element
+    map_it->first = "new key"; // error: key is const
+    ++map_it->second; // ok: we can change the value through an iterator
+    set<int> iset = {0,1,2,3,4,5,6,7,8,9};
+    set<int>::iterator set_it = iset.begin();
+    if (set_it != iset.end()) {
+     *set_it = 42; // error: keys in a set are read-only
+     cout << *set_it << endl; // ok: can read the key
+    }
+    //查找元素
+    map.find();
+    //v is vector,c is contianer
+    copy(v.begin(), v.end(), inserter(c, c.end()));//ok
+    copy(v.begin(), v.end(), back_inserter(c));//ok
+    copy(c.begin(), c.end(), inserter(v, v.end()));// ok
+    copy(c.begin(), c.end(), back_inserter(v));//bad
+    //插入
+    // four ways to add word to word_count
+    word_count.insert({word, 1});
+    word_count.insert(make_pair(word, 1));
+    word_count.insert(pair<string, size_t>(word, 1));
+    word_count.insert(map<string, size_t>::value_type(word, 1));
+    //For the containers that have unique keys, the versions of insert and
+    emplace that add a single element return a pair that lets us know whether the
+    insertion happened. The first member of the pair is an iterator to the element
+    with the given key; the second is a bool indicating whether that element was
+    inserted, or was already there. If the key is already in the container, then insert does nothing, and the bool portion of the return value is false. If the key isn’t present, then the element is inserted and the bool is true.
+    map<string, size_t> word_count; // empty map from string to size_t
+    string word;
+    while (cin >> word) {
+     // inserts an element with key equal to word and value 1;
+     // if word is already in word_count, insert does nothing
+     auto ret = word_count.insert({word, 1});
+     if (!ret.second) // word was already in word_count
+     ++ret.first->second; // increment the counter
+    }
+    //For the containers that allow multiple keys, the insert operation that takes a single element returns an iterator to the new element.
+    //search element
+    map[key]
+    map.at(key)//return value
+    map.find(key)//return iterator
+    ```
+
+  - make_pair 无需指出pair类型即可构建一个pair对象，如std::make_pair(42, '@'); 
+
+  - map的erase函数，参数为key时返回值为0/1，multimap的返回值为key的个数
+
+    ```cpp
+    c.erase(key);
+    c.erase(iter);
+    c.erase(begin_iter,end_iter);
+    ```
+
+  - 在multimap和multiset中同一个key对应的不同元素在容器中是相邻的
+
+    ```cpp
+    方法一：
+    string search_item("Alain de Botton"); // author we'll look for
+    auto entries = authors.count(search_item); // number of elements
+    auto iter = authors.find(search_item); // first entry for this author
+    // loop through the number of entries there are for this author
+    while(entries) {
+     cout << iter->second << endl; // print each title
+     ++iter; // advance to the next title
+     --entries; // keep track of how many we've printed
+    }
+    方法二：
+    // definitions of authors and search_item as above
+    // beg and end denote the range of elements for this author
+    for (auto beg = authors.lower_bound(search_item),
+     end = authors.upper_bound(search_item); beg != end; ++beg)
+     cout << beg->second << endl; // print each title
+    方法三：
+    // pos holds iterators that denote the range of elements for this key
+    for (auto pos = authors.equal_range(search_item);
+     pos.first != pos.second; ++pos.first)
+     cout << pos.first->second << endl; // print each title
+    ```
+
+  - unordered Containers
+
+    无序容器使用hash值和key之间的“==”来组织容器内的元素，在不需要排序时使用无序容器可以减少内存消耗。无序容器将元素按照hash映射将所有同样hash值的元素放在同一个桶里（multi containers中相同key的元素在同一个桶里），查找时按照hash值进行查找，所以无序容器的操作速度受hash函数和桶个数的影响。cpp还提供了对桶操作及获取当前无序容器状态的接口函数。
+
+    ```cpp
+    //Bucket Interface
+    c.bucket_count(); //Num of buckets in use
+    c.max_bucket_count();//Largest num of buckets container can hold
+    c.bucket_size(n);//Num of elements in nth bucket
+    c.bucket(k);//Bucket in which element with key k would be found
+    //Bucket Iteration 
+    local_iterator //Iterator type that can access elements in a bucket
+    const_local_iterator //const version of the bucket iterator
+    c.begin(n),c.end(n) //Iterator to the first, one past the last element in bucket n
+    c.cbegin(n), c.end(n)
+    //Hash Policy
+    c.load_factor() //Average number of elements per bucket. Returns float.
+    c.max_load_factor() //Average bucket size that c tries to maintain. c adds buckets to keep load_factor <= max_load_factor.Returns float.
+    c.rehash(n) //Reorganize storage so that bucket_count >= n and bucket_count > size/max_load_factor.
+    c.reserve(n) //Reorganize so that c can hold n elements without a rehash
+    ```
+
+    <font color='red'>值得注意的是，无序容器无法使用用户自定义的类做key，因为其hash函数无法用于自定义的类，只适用于一部分library中的类，如果需要使用自定义类，需要重写hash函数和equal函数</font>
+
+    ```cpp
+    size_t hasher(const Sales_data &sd)
+    {
+     return hash<string>()(sd.isbn());
+    }
+    bool eqOp(const Sales_data &lhs, const Sales_data &rhs)
+    {
+     return lhs.isbn() == rhs.isbn();
+    }
+    using SD_multiset = unordered_multiset<Sales_data, decltype(hasher)*, decltype(eqOp)*>;
+    // arguments are the bucket size and pointers to the hash function and equality operator
+    SD_multiset bookstore(42, hasher, eqOp);
+    //If our class has its own == operator we can override just the hash function
+    // use FooHash to generate the hash code; Foo must have an == operator
+    unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
+    ```
+
   
       
