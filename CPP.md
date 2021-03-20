@@ -414,13 +414,7 @@ int *p = &ia[2];  //p points to the element indexed by 2
 int j = p[1];     //p[1] is equivalent to *(p + 1),
                   //p[1] is the same element as ia[3]
 int k = p[-2];    //p[-2] is the same element as ia[0]
-
-
-
-
 ```
-
-
 
 ## 迭代器
 - 标准容器迭代器操作
@@ -503,8 +497,7 @@ auto it3 = v.cbegin(); // it3 has type vector<int>::const_iterator
 ```
 
 - 使用迭代器时不应向该迭代器指向的容器中增加元素
-=======
-=======
+
 Regardless of whether the vector (or string) is const, they return a const_iterator.
 ```
 auto it3 = v.cbegin(); // it3 has type vector<int>::const_iterator
