@@ -1303,28 +1303,3 @@ s = f() + g() * h() + j() //无法保证f(),g(),h(),j()的运算顺序，只能�
 	 static double initRate();
    };
    ```
-## 其它
- - char * 和 char[]的区别
-   ```
-        #include "stdafx.h"
-	#include <string>
-	#include <iostream>
-	using namespace std;
-	int _tmain(int argc, _TCHAR* argv[])
-	{
-	char *c1 = "abc";
-	char c2[] = "abc";
-	cout <<" *c1是 ：" << *c1 <<endl; // a 
-	cout <<"c2 是："<< c2 << endl; //abc
-	cout <<"*c2 是："<< *c2 << endl; //a
-
-	string namee = "xuhaitao";
-	const char *c3 = namee.data();
-	cout <<"*c3是： "<< *c3 << endl; //x
-	const char *c4 = namee.c_str(); 
-	cout <<"*c4是： "<<*c4 << endl; //x
-
-	getchar();
-	return 0;
-	}
-   ```
