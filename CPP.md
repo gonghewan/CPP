@@ -481,15 +481,10 @@ vector<int>::const_iterator it3; // it3 can read but not write elements
 string::const_iterator it4;      // it4 can read but not write characters
 ```
 
-A const_iterator behaves like a const pointer. Like a const pointer, a const_iterator may read but not write the element it denotes; an
-object of type iterator can both read and write. If a vector or string is const, we may use only its const_iterator type. With a nonconst vector or string,
-we can use either iterator or const_iterator.
-
 The type returned by begin and end depends on whether the object on which they
 operator is const. If the object is const, then begin and end return a
 const_iterator; if the object is not const, they return iterator:
 
-=======
 The type returned by begin and end depends on whether the object on which they
 operator is const. If the object is const, then begin and end return a
 const_iterator; if the object is not const, they return iterator:
