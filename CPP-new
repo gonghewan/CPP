@@ -23,3 +23,7 @@
   in &r) is the one that has the most immediate effect on the variable’s type. Thus, we know that r is a reference. The rest of the declarator determines 
   the type to which r refers. The next symbol, * in this case, says that the type r refers to is a pointer type. Finally, the base type of the declaration 
   says that r is a reference to a pointer to an int.
+  
+  
+  - const
+  编译器对于const变量时常在编译的时候就将该变量替换为常数，在互相引用的几个文件中出现的同名const变量，不会混淆，每个const变量仅对当前文件可用
