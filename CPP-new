@@ -9,3 +9,8 @@
   int *p2 = 0; // directly initializes p2 from the literal constant 0
   // must #include cstdlib
   int *p3 = NULL; // equivalent to int *p3 = 0;
+  在声明引用或定义指针时，应该将*和&与变量名置于一处：
+     - int* p1, p2; // p1 is a pointer to int; p2 is an int
+     - int *p1, *p2; // both p1 and p2 are pointers to int （建议）
+     - int* p1; // p1 is a pointer to int
+       int* p2; // p2 is a pointer to int
