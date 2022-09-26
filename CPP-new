@@ -26,4 +26,13 @@
   
   
   - const
-  编译器对于const变量时常在编译的时候就将该变量替换为常数，在互相引用的几个文件中出现的同名const变量，不会混淆，每个const变量仅对当前文件可用
+  编译器对于const变量时常在编译的时候就将该变量替换为常数，在互相引用的几个文件中出现的同名const变量，不会混淆，每个const变量仅对当前文件可用。
+  当需要在其他文件中使用本文件中定义的const变量时，需要使用extern关键字
+  // file_1.cc defines and initializes a const that is accessible to other files
+  extern const int bufSize = fcn();
+  // file_1.h
+  extern const int bufSize; // same bufSize as defined in file_1.cc
+  In this program, file_1.cc defines and initializes bufSize. Because this declaration includes an initializer, it is (as usual) a definition. However, 
+  because bufSize is const, we must specify extern in order for bufSize to be used in other files.
+  The declaration in file_1.h is also extern. In this case, the extern signifies that bufSize is not local to this file and that its definition will 
+  occur elsewhere.
