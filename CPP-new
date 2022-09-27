@@ -36,3 +36,8 @@
   because bufSize is const, we must specify extern in order for bufSize to be used in other files.
   The declaration in file_1.h is also extern. In this case, the extern signifies that bufSize is not local to this file and that its definition will 
   occur elsewhere.
+- 区别指针常量和常量指针
+  int errNumb = 0;
+  int *const curErr = &errNumb; // curErr will always point to errNumb
+  const double pi = 3.14159;
+  const double *const pip = &pi; // pip is a const pointer to a const object
