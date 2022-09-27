@@ -54,3 +54,10 @@
   
 - 变量类型
   需要注意如int和unsigned int之间的转换，值得一提的是，我们在定义或赋值一个负数时，如int a = -10，实际上存储的是10，“-”会作为符号来保存
+  
+- 别名
+  - typedef
+    typedef double wages; // wages is a synonym for double
+    typedef wages base, *p; // base is a synonym for double, p for double*
+  - using
+    using SI = Sales_item; // SI is a synonym for Sales_item
