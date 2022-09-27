@@ -61,3 +61,6 @@
     typedef wages base, *p; // base is a synonym for double, p for double*
   - using
     using SI = Sales_item; // SI is a synonym for Sales_item
+- auto
+  auto i = 0, *p = &i; // ok: i is int and p is a pointer to int
+  auto sz = 0, pi = 3.14; // error: inconsistent types for sz and pi
