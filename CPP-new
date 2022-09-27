@@ -36,6 +36,8 @@
   because bufSize is const, we must specify extern in order for bufSize to be used in other files.
   The declaration in file_1.h is also extern. In this case, the extern signifies that bufSize is not local to this file and that its definition will 
   occur elsewhere.
+  
+  
 - 区别指针常量和常量指针
   int errNumb = 0;
   int *const curErr = &errNumb; // curErr will always point to errNumb
@@ -43,5 +45,12 @@
   const double *const pip = &pi; // pip is a const pointer to a const object
   top-level const: a const pointer points to const object
   low-level const: a nonconst pointer points to const object
+  
+  
+- constexpr，编译时即确定值
+  const int *p = nullptr; // p is a pointer to a const int
+  constexpr int *q = nullptr; // q is a const pointer to int
+  
+  
 - 变量类型
   需要注意如int和unsigned int之间的转换，值得一提的是，我们在定义或赋值一个负数时，如int a = -10，实际上存储的是10，“-”会作为符号来保存
