@@ -1,3 +1,4 @@
+## 第二章
 - 引用与指针
   - 引用，不是一个object，所以没有地址，也意味着指针是无法指向引用的
   - 指针，是一个object，其值是地址
@@ -64,3 +65,12 @@
 - auto
   auto i = 0, *p = &i; // ok: i is int and p is a pointer to int
   auto sz = 0, pi = 3.14; // error: inconsistent types for sz and pi
+## 第三章
+- 拷贝初始化和直接初始化
+  https://en.cppreference.com/w/cpp/language/direct_initialization
+  string s5 = "hiya"; // copy initialization
+  string s6("hiya"); // direct initialization
+  string s7(10, 'c'); // direct initialization; s7 is cccccccccc
+  - copy initialization
+    当初始化函数为显式（explicit）时，拷贝初始化将失败。
+  - direct initialization
