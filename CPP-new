@@ -74,3 +74,7 @@
   - copy initialization
     当初始化函数为显式（explicit）时，拷贝初始化将失败。
   - direct initialization
+- cin
+  返回值是输入流本身，所以在cin << x << y << ...中不需要区分x和y的类型
+- size
+  string.size()返回值是string::size_type类型，可以看作是一个可以足够大的无符号数
