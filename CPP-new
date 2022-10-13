@@ -78,3 +78,5 @@
   返回值是输入流本身，所以在cin << x << y << ...中不需要区分x和y的类型
 - size
   string.size()返回值是string::size_type类型，可以看作是一个可以足够大的无符号数
+- vector
+ stl container的元素应该是可赋值的可交换位置的，所以像<const int>、<int&>之类的都不可以作为vector的元素
