@@ -80,3 +80,6 @@
   string.size()返回值是string::size_type类型，可以看作是一个可以足够大的无符号数
 - vector
  stl container的元素应该是可赋值的可交换位置的，所以像<const int>、<int&>之类的都不可以作为vector的元素
+- iterator
+ 在遍历容器的for循环中不可以执行改变容器的size的操作，如push_back或者remove、erase等
+ ？？？在xcode中试了一下是可以的，当执行erase(iter);时，iter会自增
