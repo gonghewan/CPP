@@ -84,4 +84,10 @@
  迭代器有五种：输入（容器而言），输出（对容器而言），单向访问，双向访问，随机访问，ref:https://cplusplus.com/reference/iterator/
  在遍历容器的for循环中不可以执行改变容器的size的操作，如push_back或者remove、erase等
  ？？？在xcode中试了一下是可以的，当执行erase(iter);时，iter会自增
- 
+ - array
+ 遍历array除了下标也可以使用begin(),end()
+ // pbeg points to the first and pend points just past the last element in arr
+ int *pbeg = begin(arr), *pend = end(arr);
+ // find the first negative element, stopping if we've seen all the elements
+ while (pbeg != pend && *pbeg >= 0)
+    ++pbeg;
