@@ -48,7 +48,7 @@
   low-level const: a nonconst pointer points to const object
   
   
-- constexpr，编译时即确定值
+- constexpr，**编译时即确定值** 是与const的本质区别，当需要编译时便确定值的情况下用constexpr
   const int *p = nullptr; // p is a pointer to a const int
   constexpr int *q = nullptr; // q is a const pointer to int
   
