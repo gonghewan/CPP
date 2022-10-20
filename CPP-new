@@ -85,9 +85,18 @@
  在遍历容器的for循环中不可以执行改变容器的size的操作，如push_back或者remove、erase等
  ？？？在xcode中试了一下是可以的，当执行erase(iter);时，iter会自增
  - array
+ 多维数组遍历时需要注意：
+ for (const auto &row : ia) // for every element in the outer array
+   for (auto col : row) // for every element in the inner array
+      cout << col << endl;
+ 而不是：
+ for (auto row : ia) 
+    for (auto col : row)
+ 下面这种方式，row是一个指针，无法对指针进行遍历操作
  遍历array除了下标也可以使用begin(),end()
  // pbeg points to the first and pend points just past the last element in arr
  int *pbeg = begin(arr), *pend = end(arr);
  // find the first negative element, stopping if we've seen all the elements
  while (pbeg != pend && *pbeg >= 0)
     ++pbeg;
+ 
