@@ -99,4 +99,6 @@
  // find the first negative element, stopping if we've seen all the elements
  while (pbeg != pend && *pbeg >= 0)
     ++pbeg;
- 
+ 数组指针和指针数组：
+ int *ip[4]; // array of pointers to int
+ int (*ip)[4]; // pointer to an array of four ints
