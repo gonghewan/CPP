@@ -103,6 +103,8 @@
  int *ip[4]; // array of pointers to int
  int (*ip)[4]; // pointer to an array of four ints
  ## 第四章
-  As a simple example, the << operator makes no guarantees about when or how its operands are evaluated. As a result, the following output expression is undefined:
+ For operators that do not specify evaluation order, it is an error for an expression to refer to and change the same object. 
+ As a simple example, the << operator makes no guarantees about when or how its operands are evaluated. As a result, the 
+ following output expression is undefined:
   int i = 0;
   cout << i << " " << ++i << endl; // undefined
