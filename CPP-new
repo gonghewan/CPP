@@ -114,4 +114,9 @@
  注意真假判断时==true并不代表为真的判断
  if (val == true) { /* ... */ } // true only if val is equal to 1!
  if (val) { /* ... */ } // true only if val is true!
-
+ 一种推荐写法：
+  int i;
+  // a better way to write our loop---what the condition does is now clearer
+  while ((i = get_value()) != 42) {
+   // do something ...
+  }
