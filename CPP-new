@@ -103,6 +103,7 @@
  int *ip[4]; // array of pointers to int
  int (*ip)[4]; // pointer to an array of four ints
  ## 第四章
+ 运算符
  For operators that do not specify evaluation order, it is an error for an expression to refer to and change the same object. 
  As a simple example, the << operator makes no guarantees about when or how its operands are evaluated. As a result, the 
  following output expression is undefined:
@@ -110,5 +111,7 @@
   cout << i << " " << ++i << endl; // undefined
   int i = f1() * f2(); // 无法保证f1先执行还是f2先执行
   int s = f() + g() * h() + j(); //无法保证哪个函数先执行
+ 注意真假判断时==true并不代表为真的判断
+ if (val == true) { /* ... */ } // true only if val is equal to 1!
+ if (val) { /* ... */ } // true only if val is true!
 
- following output expression is undefined:
