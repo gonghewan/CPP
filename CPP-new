@@ -108,3 +108,7 @@
  following output expression is undefined:
   int i = 0;
   cout << i << " " << ++i << endl; // undefined
+  int i = f1() * f2(); // 无法保证f1先执行还是f2先执行
+  int s = f() + g() * h() + j(); //无法保证哪个函数先执行
+
+ following output expression is undefined:
