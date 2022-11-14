@@ -120,3 +120,10 @@
   while ((i = get_value()) != 42) {
    // do something ...
   }
+++i与i++的区别：
+int i = 0, j;
+j = ++i; // j = 1, i = 1: prefix yields the incremented value
+j = i++; // j = 1, i = 2: postfix yields the unincremented value
+These operators require lvalue operands. The prefix operators return the object itself
+as an lvalue. The postfix operators return a copy of the object’s original value as an
+rvalue
