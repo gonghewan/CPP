@@ -137,3 +137,10 @@ while (beg != s.end() && !isspace(*beg))
  这种情况还是建议
  for (auto it = s.begin(); it != s.end() && !isspace(*it); ++it)
   *it = toupper(*it); // capitalize the current character
+ 逗号可以保证运算顺序
+  vector<int>::size_type cnt = ivec.size();
+  // assign values from size... 1 to the elements in ivec
+  for(vector<int>::size_type ix = 0;
+     ix != ivec.size(); ++ix, --cnt) ivec[ix] = cnt;
+ This loop increments ix and decrements cnt in the expression in the for header. Both ix and cnt are changed on each trip through the loop. As long as the test of ix
+succeeds, we reset the next element to the current value of cnt.
