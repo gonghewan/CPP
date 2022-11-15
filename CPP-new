@@ -124,10 +124,23 @@
 int i = 0, j;
 j = ++i; // j = 1, i = 1: prefix yields the incremented value
 j = i++; // j = 1, i = 2: postfix yields the unincremented value
-These operators require lvalue operands. The prefix operators return the object itself
-as an lvalue. The postfix operators return a copy of the object’s original value as an
-rvalue
-建议写法：
+These operators require lvalue operands. The prefix operators return the object itself as an lvalue. The postfix operators return a copy of the object’s 
+original value as an rvalue
+// ++i实现代码为：
+int& operator++()
+{
+    *this += 1;
+    return *this;
+}
+//i++实现代码为：                                    
+int operator++(int)                                  
+{
+    int temp = *this;                                     
+    ++*this;                                             
+    return temp;                                    
+}//返回一个int型的对象本身
+
+一种建议写法：
 cout << *iter++ << endl;
 替代cout << *iter << endl;  ++iter;
 一种错误写法：
