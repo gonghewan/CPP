@@ -130,3 +130,7 @@ rvalue
 建议写法：
 cout << *iter++ << endl;
 替代cout << *iter << endl;  ++iter;
+一种错误写法：
+// the behavior of the following loop is undefined!
+while (beg != s.end() && !isspace(*beg))
+ *beg = toupper(*beg++); // error: this assignment is undefined，beg在被更新时可能已经指向了beg+1
