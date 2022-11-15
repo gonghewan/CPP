@@ -157,3 +157,6 @@ while (beg != s.end() && !isspace(*beg))
      ix != ivec.size(); ++ix, --cnt) ivec[ix] = cnt;
  This loop increments ix and decrements cnt in the expression in the for header. Both ix and cnt are changed on each trip through the loop. As long as the test of ix
 succeeds, we reset the next element to the current value of cnt.
+显式类型转换
+static_cast（常用于大的类型向具体的类型转换）, dynamic_cast, const_cast（将const转换为nonconst）, and reinterpret_cast.
+
