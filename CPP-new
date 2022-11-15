@@ -127,3 +127,6 @@ j = i++; // j = 1, i = 2: postfix yields the unincremented value
 These operators require lvalue operands. The prefix operators return the object itself
 as an lvalue. The postfix operators return a copy of the object’s original value as an
 rvalue
+建议写法：
+cout << *iter++ << endl;
+替代cout << *iter << endl;  ++iter;
